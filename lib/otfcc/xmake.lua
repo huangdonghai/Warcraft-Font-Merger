@@ -1,6 +1,6 @@
 target("otfcc")
 	set_kind("static")
 	add_deps("json-builder", "json-parser", "sds", "uthash")
-	add_files("src/**.c")
+	add_files("src/**.c", {sourcekind = "cxx"})
 	add_includedirs("include", {public = true})
 	add_includedirs("src")

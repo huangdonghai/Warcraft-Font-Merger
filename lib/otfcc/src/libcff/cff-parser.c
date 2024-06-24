@@ -375,7 +375,7 @@ void cff_parseOutline(uint8_t *data, uint32_t len, cff_Index gsubr, cff_Index ls
 					case op_hstem:
 					case op_vstem:
 					case op_hstemhm:
-					case op_vstemhm:
+					case op_vstemhm: {
 						if (stack->index % 2) setWidth(outline, stack->stack[0].d);
 						stack->stem += stack->index >> 1;
 						double hintBase = 0;
@@ -388,6 +388,7 @@ void cff_parseOutline(uint8_t *data, uint32_t len, cff_Index gsubr, cff_Index ls
 						}
 						stack->index = 0;
 						break;
+					}
 					case op_hintmask:
 					case op_cntrmask: {
 						if (stack->index % 2) setWidth(outline, stack->stack[0].d);

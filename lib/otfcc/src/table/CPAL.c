@@ -38,15 +38,21 @@ table_CPAL *otfcc_readCPAL(const otfcc_Packet packet, const otfcc_Options *optio
 		uint32_t length = table.length;
 		if (length < 2) goto FAIL;
 		t = table_iCPAL.create();
-		uint16_t version = read_16u(data);
-		uint32_t tableHeaderLength = (version == 0 ? 14 : 26);
+		uint16_t version;
+		version = read_16u(data);
+		uint32_t tableHeaderLength;
+		tableHeaderLength = (version == 0 ? 14 : 26);
 		if (length < tableHeaderLength) goto FAIL;
 
 		t->version = version;
-		uint16_t numPalettesEntries = read_16u(data + 2);
-		uint16_t numPalettes = read_16u(data + 4);
-		uint16_t numColorRecords = read_16u(data + 6);
-		uint32_t offsetFirstColorRecord = read_32u(data + 8);
+		uint16_t numPalettesEntries;
+		numPalettesEntries = read_16u(data + 2);
+		uint16_t numPalettes;
+		numPalettes = read_16u(data + 4);
+		uint16_t numColorRecords;
+		numColorRecords = read_16u(data + 6);
+		uint32_t offsetFirstColorRecord;
+		offsetFirstColorRecord = read_32u(data + 8);
 		if (length < offsetFirstColorRecord + numColorRecords * 4) goto FAIL;
 		if (length < tableHeaderLength + 2 * numPalettes) goto FAIL;
 
@@ -54,9 +60,9 @@ table_CPAL *otfcc_readCPAL(const otfcc_Packet packet, const otfcc_Options *optio
 		cpal_Color *colorList;
 		NEW(colorList, numColorRecords);
 		for (uint16_t j = 0; j < numColorRecords; j++) {
-			colorList[j] = (cpal_Color){.blue = read_8u(data + offsetFirstColorRecord + j * 4),
+			colorList[j] = (cpal_Color){.red = read_8u(data + offsetFirstColorRecord + j * 4 + 2),
 			                            .green = read_8u(data + offsetFirstColorRecord + j * 4 + 1),
-			                            .red = read_8u(data + offsetFirstColorRecord + j * 4 + 2),
+			                            .blue = read_8u(data + offsetFirstColorRecord + j * 4),
 			                            .alpha = read_8u(data + offsetFirstColorRecord + j * 4 + 3),
 			                            .label = 0xFFFF};
 		}

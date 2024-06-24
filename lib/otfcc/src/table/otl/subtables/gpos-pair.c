@@ -38,7 +38,8 @@ otl_Subtable *otl_read_gpos_pair(const font_file_pointer data, uint32_t tableLen
 	subtable_gpos_pair *subtable = iSubtable_gpos_pair.create();
 
 	checkLength(offset + 2);
-	uint16_t subtableFormat = read_16u(data + offset);
+	uint16_t subtableFormat;
+	subtableFormat = read_16u(data + offset);
 	if (subtableFormat == 1) {
 		// pair adjustment by individuals
 		otl_Coverage *cov = Coverage.read(data, tableLength, offset + read_16u(data + offset + 2));
@@ -218,8 +219,10 @@ otl_Subtable *otl_gpos_parse_pair(const json_value *_subtable, const otfcc_Optio
 	subtable->second = ClassDef.parse(json_obj_get_type(_subtable, "second", json_object));
 	if (!_mat || !subtable->first || !subtable->second) goto FAIL;
 
-	glyphclass_t class1Count = subtable->first->maxclass + 1;
-	glyphclass_t class2Count = subtable->second->maxclass + 1;
+	glyphclass_t class1Count;
+	class1Count = subtable->first->maxclass + 1;
+	glyphclass_t class2Count;
+	class2Count = subtable->second->maxclass + 1;
 
 	NEW(subtable->firstValues, class1Count);
 	NEW(subtable->secondValues, class1Count);

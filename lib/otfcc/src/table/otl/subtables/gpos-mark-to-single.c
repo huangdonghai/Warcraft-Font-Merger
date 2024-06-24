@@ -36,14 +36,17 @@ otl_Subtable *otl_read_gpos_markToSingle(const font_file_pointer data, uint32_t 
 	if (!marks || marks->numGlyphs == 0 || !bases || bases->numGlyphs == 0) goto FAIL;
 
 	subtable->classCount = read_16u(data + subtableOffset + 6);
-	uint32_t markArrayOffset = subtableOffset + read_16u(data + subtableOffset + 8);
+	uint32_t markArrayOffset;
+	markArrayOffset = subtableOffset + read_16u(data + subtableOffset + 8);
 	otl_readMarkArray(&subtable->markArray, marks, data, tableLength, markArrayOffset);
 
-	uint32_t baseArrayOffset = subtableOffset + read_16u(data + subtableOffset + 10);
+	uint32_t baseArrayOffset;
+	baseArrayOffset = subtableOffset + read_16u(data + subtableOffset + 10);
 	checkLength(baseArrayOffset + 2 + 2 * bases->numGlyphs * subtable->classCount);
 	if (read_16u(data + baseArrayOffset) != bases->numGlyphs) goto FAIL;
 
-	uint32_t _offset = baseArrayOffset + 2;
+	uint32_t _offset;
+	_offset = baseArrayOffset + 2;
 	for (glyphid_t j = 0; j < bases->numGlyphs; j++) {
 		otl_Anchor *baseAnchors;
 		NEW(baseAnchors, subtable->classCount);

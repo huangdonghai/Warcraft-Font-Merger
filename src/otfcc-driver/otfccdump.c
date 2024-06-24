@@ -233,7 +233,7 @@ int main(int argc, char *argv[]) {
 		}
 		if (show_ugly) jsonOptions.mode = json_serialize_mode_packed;
 		buflen = json_measure_ex(root, jsonOptions);
-		buf = calloc(1, buflen);
+		buf = (char *)calloc(1, buflen);
 		json_serialize_ex(buf, root, jsonOptions);
 		logStepTime;
 	}

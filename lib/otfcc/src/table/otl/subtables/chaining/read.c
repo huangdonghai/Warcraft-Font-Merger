@@ -87,8 +87,10 @@ otl_ChainingRule *GeneralReadContextualRule(font_file_pointer data, uint32_t tab
 	uint16_t minusOneQ = (minusOne ? 1 : 0);
 
 	checkLength(offset + 4);
-	uint16_t nInput = read_16u(data + offset);
-	uint16_t nApply = read_16u(data + offset + 2);
+	uint16_t nInput;
+	nInput = read_16u(data + offset);
+	uint16_t nApply;
+	nApply = read_16u(data + offset + 2);
 	checkLength(offset + 4 + 2 * nInput + 4 * nApply);
 
 	rule->matchCount = nInput;
@@ -96,7 +98,8 @@ otl_ChainingRule *GeneralReadContextualRule(font_file_pointer data, uint32_t tab
 	rule->inputEnds = nInput;
 
 	NEW(rule->match, rule->matchCount);
-	uint16_t jj = 0;
+	uint16_t jj;
+	jj = 0;
 	if (minusOne) {
 		rule->match[jj++] = fn(data, tableLength, startGID, offset, 2, maxGlyphs, userdata);
 	}
@@ -126,14 +129,18 @@ static subtable_chaining *readContextualFormat1(subtable_chaining *subtable,
 	// Contextual Substitution Subtable, Simple.
 	checkLength(offset + 6);
 
-	uint16_t covOffset = offset + read_16u(data + offset + 2);
-	otl_Coverage *firstCoverage = Coverage.read(data, tableLength, covOffset);
+	uint16_t covOffset;
+	covOffset = offset + read_16u(data + offset + 2);
+	otl_Coverage *firstCoverage;
+	firstCoverage = Coverage.read(data, tableLength, covOffset);
 
-	tableid_t chainSubRuleSetCount = read_16u(data + offset + 4);
+	tableid_t chainSubRuleSetCount;
+	chainSubRuleSetCount = read_16u(data + offset + 4);
 	if (chainSubRuleSetCount != firstCoverage->numGlyphs) goto FAIL;
 	checkLength(offset + 6 + 2 * chainSubRuleSetCount);
 
-	tableid_t totalRules = 0;
+	tableid_t totalRules;
+	totalRules = 0;
 	for (tableid_t j = 0; j < chainSubRuleSetCount; j++) {
 		uint32_t srsOffset = offset + read_16u(data + offset + 6 + j * 2);
 		checkLength(srsOffset + 2);
@@ -143,7 +150,8 @@ static subtable_chaining *readContextualFormat1(subtable_chaining *subtable,
 	subtable->rulesCount = totalRules;
 	NEW(subtable->rules, totalRules);
 
-	tableid_t jj = 0;
+	tableid_t jj;
+	jj = 0;
 	for (tableid_t j = 0; j < chainSubRuleSetCount; j++) {
 		uint32_t srsOffset = offset + read_16u(data + offset + 6 + j * 2);
 		tableid_t srsCount = read_16u(data + srsOffset);
@@ -174,10 +182,12 @@ static subtable_chaining *readContextualFormat2(subtable_chaining *subtable,
 	cds->ic = ClassDef.read(data, tableLength, offset + read_16u(data + offset + 4));
 	cds->fc = NULL;
 
-	tableid_t chainSubClassSetCnt = read_16u(data + offset + 6);
+	tableid_t chainSubClassSetCnt;
+	chainSubClassSetCnt = read_16u(data + offset + 6);
 	checkLength(offset + 12 + 2 * chainSubClassSetCnt);
 
-	tableid_t totalRules = 0;
+	tableid_t totalRules;
+	totalRules = 0;
 	for (tableid_t j = 0; j < chainSubClassSetCnt; j++) {
 		uint32_t srcOffset = read_16u(data + offset + 8 + j * 2);
 		if (srcOffset) { totalRules += read_16u(data + offset + srcOffset); }
@@ -185,7 +195,8 @@ static subtable_chaining *readContextualFormat2(subtable_chaining *subtable,
 	subtable->rulesCount = totalRules;
 	NEW(subtable->rules, totalRules);
 
-	tableid_t jj = 0;
+	tableid_t jj;
+	jj = 0;
 	for (tableid_t j = 0; j < chainSubClassSetCnt; j++) {
 		uint32_t srcOffset = read_16u(data + offset + 8 + j * 2);
 		if (srcOffset) {
@@ -251,13 +262,17 @@ otl_ChainingRule *GeneralReadChainingRule(font_file_pointer data, uint32_t table
 	uint16_t minusOneQ = (minusOne ? 1 : 0);
 
 	checkLength(offset + 8);
-	tableid_t nBack = read_16u(data + offset);
+	tableid_t nBack;
+	nBack = read_16u(data + offset);
 	checkLength(offset + 2 + 2 * nBack + 2);
-	tableid_t nInput = read_16u(data + offset + 2 + 2 * nBack);
+	tableid_t nInput;
+	nInput = read_16u(data + offset + 2 + 2 * nBack);
 	checkLength(offset + 4 + 2 * (nBack + nInput - minusOneQ) + 2);
-	tableid_t nLookaround = read_16u(data + offset + 4 + 2 * (nBack + nInput - minusOneQ));
+	tableid_t nLookaround;
+	nLookaround = read_16u(data + offset + 4 + 2 * (nBack + nInput - minusOneQ));
 	checkLength(offset + 6 + 2 * (nBack + nInput - minusOneQ + nLookaround) + 2);
-	tableid_t nApply = read_16u(data + offset + 6 + 2 * (nBack + nInput - minusOneQ + nLookaround));
+	tableid_t nApply;
+	nApply = read_16u(data + offset + 6 + 2 * (nBack + nInput - minusOneQ + nLookaround));
 	checkLength(offset + 8 + 2 * (nBack + nInput - minusOneQ + nLookaround) + nApply * 4);
 
 	rule->matchCount = nBack + nInput + nLookaround;
@@ -265,7 +280,8 @@ otl_ChainingRule *GeneralReadChainingRule(font_file_pointer data, uint32_t table
 	rule->inputEnds = nBack + nInput;
 
 	NEW(rule->match, rule->matchCount);
-	tableid_t jj = 0;
+	tableid_t jj;
+	jj = 0;
 	for (tableid_t j = 0; j < nBack; j++) {
 		uint32_t gid = read_16u(data + offset + 2 + j * 2);
 		rule->match[jj++] = fn(data, tableLength, gid, offset, 1, maxGlyphs, userdata);
@@ -303,14 +319,18 @@ static subtable_chaining *readChainingFormat1(subtable_chaining *subtable,
 	// Contextual Substitution Subtable, Simple.
 	checkLength(offset + 6);
 
-	uint16_t covOffset = offset + read_16u(data + offset + 2);
-	otl_Coverage *firstCoverage = Coverage.read(data, tableLength, covOffset);
+	uint16_t covOffset;
+	covOffset = offset + read_16u(data + offset + 2);
+	otl_Coverage *firstCoverage;
+	firstCoverage = Coverage.read(data, tableLength, covOffset);
 
-	tableid_t chainSubRuleSetCount = read_16u(data + offset + 4);
+	tableid_t chainSubRuleSetCount;
+	chainSubRuleSetCount = read_16u(data + offset + 4);
 	if (chainSubRuleSetCount != firstCoverage->numGlyphs) goto FAIL;
 	checkLength(offset + 6 + 2 * chainSubRuleSetCount);
 
-	tableid_t totalRules = 0;
+	tableid_t totalRules;
+	totalRules = 0;
 	for (tableid_t j = 0; j < chainSubRuleSetCount; j++) {
 		uint32_t srsOffset = offset + read_16u(data + offset + 6 + j * 2);
 		checkLength(srsOffset + 2);
@@ -320,7 +340,8 @@ static subtable_chaining *readChainingFormat1(subtable_chaining *subtable,
 	subtable->rulesCount = totalRules;
 	NEW(subtable->rules, totalRules);
 
-	tableid_t jj = 0;
+	tableid_t jj;
+	jj = 0;
 	for (tableid_t j = 0; j < chainSubRuleSetCount; j++) {
 		uint32_t srsOffset = offset + read_16u(data + offset + 6 + j * 2);
 		tableid_t srsCount = read_16u(data + srsOffset);
@@ -351,10 +372,12 @@ static subtable_chaining *readChainingFormat2(subtable_chaining *subtable,
 	cds->ic = ClassDef.read(data, tableLength, offset + read_16u(data + offset + 6));
 	cds->fc = ClassDef.read(data, tableLength, offset + read_16u(data + offset + 8));
 
-	tableid_t chainSubClassSetCnt = read_16u(data + offset + 10);
+	tableid_t chainSubClassSetCnt;
+	chainSubClassSetCnt = read_16u(data + offset + 10);
 	checkLength(offset + 12 + 2 * chainSubClassSetCnt);
 
-	tableid_t totalRules = 0;
+	tableid_t totalRules;
+	totalRules = 0;
 	for (tableid_t j = 0; j < chainSubClassSetCnt; j++) {
 		uint32_t srcOffset = read_16u(data + offset + 12 + j * 2);
 		if (srcOffset) { totalRules += read_16u(data + offset + srcOffset); }
@@ -362,7 +385,8 @@ static subtable_chaining *readChainingFormat2(subtable_chaining *subtable,
 	subtable->rulesCount = totalRules;
 	NEW(subtable->rules, totalRules);
 
-	tableid_t jj = 0;
+	tableid_t jj;
+	jj = 0;
 	for (tableid_t j = 0; j < chainSubClassSetCnt; j++) {
 		uint32_t srcOffset = read_16u(data + offset + 12 + j * 2);
 		if (srcOffset) {

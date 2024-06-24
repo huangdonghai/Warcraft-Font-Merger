@@ -61,7 +61,8 @@ static otl_CaretValueRecord readLigCaretRecord(const font_file_pointer data, uin
 	otl_CaretValueRecord g;
 	otl_iCaretValueRecord.init(&g);
 	checkLength(offset + 2);
-	shapeid_t caretCount = read_16u(data + offset);
+	shapeid_t caretCount;
+	caretCount = read_16u(data + offset);
 	checkLength(offset + 2 + caretCount * 2);
 
 	for (glyphid_t j = 0; j < caretCount; j++) {
@@ -80,11 +81,13 @@ table_GDEF *otfcc_readGDEF(const otfcc_Packet packet, const otfcc_Options *optio
 		uint32_t tableLength = table.length;
 		checkLength(12);
 		gdef = table_iGDEF.create();
-		uint16_t classdefOffset = read_16u(data + 4);
+		uint16_t classdefOffset;
+		classdefOffset = read_16u(data + 4);
 		if (classdefOffset) {
 			gdef->glyphClassDef = ClassDef.read(data, tableLength, classdefOffset);
 		}
-		uint16_t ligCaretOffset = read_16u(data + 8);
+		uint16_t ligCaretOffset;
+		ligCaretOffset = read_16u(data + 8);
 		if (ligCaretOffset) {
 			checkLength(ligCaretOffset + 4);
 			otl_Coverage *cov =
@@ -100,7 +103,8 @@ table_GDEF *otfcc_readGDEF(const otfcc_Packet packet, const otfcc_Options *optio
 			}
 			Coverage.free(cov);
 		}
-		uint16_t markAttachDefOffset = read_16u(data + 10);
+		uint16_t markAttachDefOffset;
+		markAttachDefOffset = read_16u(data + 10);
 		if (markAttachDefOffset) {
 			gdef->markAttachClassDef = ClassDef.read(data, tableLength, markAttachDefOffset);
 		}

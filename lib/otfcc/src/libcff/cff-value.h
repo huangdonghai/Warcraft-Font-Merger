@@ -8,6 +8,7 @@
 #include "support/util.h"
 
 typedef enum {
+	invalid = 0,
 	cff_OPERATOR = 1,
 	CS2_OPERATOR = 1,
 	cff_INTEGER = 2,

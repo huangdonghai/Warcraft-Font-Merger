@@ -1,0 +1,14 @@
+BasedOnStyle: LLVM
+TabWidth: 4
+IndentWidth: 4
+UseTab: ForIndentation
+AllowShortBlocksOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: false
+ColumnLimit: 100
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+IndentCaseLabels: true
+AlignOperands: true
+AlignAfterOpenBracket: true
+SortIncludes: false

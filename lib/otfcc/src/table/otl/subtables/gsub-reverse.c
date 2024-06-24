@@ -34,13 +34,16 @@ otl_Subtable *otl_read_gsub_reverse(const font_file_pointer data, uint32_t table
 	subtable_gsub_reverse *subtable = iSubtable_gsub_reverse.create();
 	checkLength(offset + 6);
 
-	tableid_t nBacktrack = read_16u(data + offset + 4);
+	tableid_t nBacktrack;
+	nBacktrack = read_16u(data + offset + 4);
 	checkLength(offset + 6 + nBacktrack * 2);
 
-	tableid_t nForward = read_16u(data + offset + 6 + nBacktrack * 2);
+	tableid_t nForward;
+	nForward = read_16u(data + offset + 6 + nBacktrack * 2);
 	checkLength(offset + 8 + (nBacktrack + nForward) * 2);
 
-	tableid_t nReplacement = read_16u(data + offset + 8 + (nBacktrack + nForward) * 2);
+	tableid_t nReplacement;
+	nReplacement = read_16u(data + offset + 8 + (nBacktrack + nForward) * 2);
 	checkLength(offset + 10 + (nBacktrack + nForward + nReplacement) * 2);
 
 	subtable->matchCount = nBacktrack + nForward + 1;

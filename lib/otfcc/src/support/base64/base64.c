@@ -1,7 +1,7 @@
 #include "base64.h"
 #include "../otfcc-alloc.h"
 
-static const uint8_t base64_table[64] =
+static const uint8_t base64_table[64 + 1] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 uint8_t *base64_encode(const uint8_t *src, size_t len, size_t *out_len) {
@@ -11,7 +11,7 @@ uint8_t *base64_encode(const uint8_t *src, size_t len, size_t *out_len) {
 
 	olen = (len + 3 - 1) / 3 * 4; /* 3-byte blocks to 4-byte */
 	olen++;                       /* nul termination */
-	out = __caryll_malloc(sizeof(uint8_t) * olen);
+	out = (uint8_t *)__caryll_malloc(sizeof(uint8_t) * olen);
 	if (out == NULL) return NULL;
 
 	end = src + len;
@@ -58,7 +58,7 @@ uint8_t *base64_decode(const uint8_t *src, size_t len, size_t *out_len) {
 
 	if (count % 4) return NULL;
 
-	pos = out = __caryll_malloc(sizeof(uint8_t) * count);
+	pos = out = (uint8_t *)__caryll_malloc(sizeof(uint8_t) * count);
 	if (out == NULL) return NULL;
 
 	count = 0;

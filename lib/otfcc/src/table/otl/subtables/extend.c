@@ -9,8 +9,9 @@ static otl_Subtable *_caryll_read_otl_extend(font_file_pointer data, uint32_t ta
 	otl_Subtable *_subtable;
 	NEW(_subtable);
 	checkLength(subtableOffset + 8);
-	subtable_extend *subtable = &(_subtable->extend);
-	subtable->type = read_16u(data + subtableOffset + 2) + BASIS;
+	subtable_extend *subtable;
+	subtable = &(_subtable->extend);
+	subtable->type = (otl_LookupType)(read_16u(data + subtableOffset + 2) + BASIS);
 	subtable->subtable = otfcc_readOtl_subtable(
 	    data, tableLength, subtableOffset + read_32u(data + subtableOffset + 4), subtable->type,
 	    maxGlyphs, options);

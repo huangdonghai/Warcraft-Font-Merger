@@ -95,8 +95,8 @@ static void showVQS(const vq_Segment x) {
 caryll_ShowFns(vq_Segment, showVQS);
 caryll_ElementInterfaceOf(vq_Segment) vq_iSegment = {
     caryll_standardValTypeMethods(vq_Segment),
-    caryll_OrdEqAssigns(vq_Segment), // Ord and Eq
     caryll_ShowAssigns(vq_Segment),  // Show
+    caryll_OrdEqAssigns(vq_Segment), // Ord and Eq
     // creating instances
     .createStill = vqsCreateStill,
     .createDelta = vqsCreateDelta,
@@ -271,15 +271,15 @@ static VQ vqPointLinearTfm(const VQ ax, pos_t a, const VQ x, pos_t b, const VQ y
 
 caryll_VectorInterfaceTypeName(VQ) iVQ = {
     caryll_standardValTypeMethods(VQ),
-    .getStill = vqGetStill,
-    .createStill = vqCreateStill,
-    .isStill = vqIsStill,
-    .isZero = vqIsZero,
     caryll_MonoidAssigns(VQ),           // Monoid
     caryll_GroupAssigns(VQ),            // Group
     caryll_ModuleAssigns(VQ),           // Module
     caryll_OrdEqAssigns(VQ),            // Eq-Ord
     caryll_ShowAssigns(VQ),             // Show
+    .getStill = vqGetStill,
+    .createStill = vqCreateStill,
+    .isStill = vqIsStill,
+    .isZero = vqIsZero,
     .pointLinearTfm = vqPointLinearTfm, // pointLinearTfm
     .addDelta = vqAddDelta              // addDelta
 };

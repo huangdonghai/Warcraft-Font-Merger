@@ -11,7 +11,8 @@ caryll_standardVectorImpl(otl_MarkArray, otl_MarkRecord, gss_typeinfo, otl_iMark
 void otl_readMarkArray(otl_MarkArray *array, otl_Coverage *cov, font_file_pointer data,
                        uint32_t tableLength, uint32_t offset) {
 	checkLength(offset + 2);
-	glyphid_t markCount = read_16u(data + offset);
+	glyphid_t markCount;
+	markCount = read_16u(data + offset);
 	for (glyphid_t j = 0; j < markCount; j++) {
 		glyphclass_t markClass = read_16u(data + offset + 2 + j * 4);
 		uint16_t delta = read_16u(data + offset + 2 + j * 4 + 2);

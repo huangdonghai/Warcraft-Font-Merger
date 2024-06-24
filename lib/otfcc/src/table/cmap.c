@@ -281,7 +281,8 @@ table_cmap *otfcc_readCmap(const otfcc_Packet packet, const otfcc_Options *optio
 		if (length < 4) goto CMAP_CORRUPTED;
 
 		cmap = table_iCmap.create(); // intialize to empty hashtable
-		uint16_t numTables = read_16u(data + 2);
+		uint16_t numTables;
+		numTables = read_16u(data + 2);
 		if (length < 4 + 8 * numTables) goto CMAP_CORRUPTED;
 
 		// step 1 : read format 12. The results are prioritized

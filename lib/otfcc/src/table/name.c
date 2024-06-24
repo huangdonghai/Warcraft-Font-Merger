@@ -39,8 +39,10 @@ table_name *otfcc_readName(const otfcc_Packet packet, const otfcc_Options *optio
 
 		uint32_t length = table.length;
 		if (length < 6) goto TABLE_NAME_CORRUPTED;
-		uint32_t count = read_16u(data + 2);
-		uint32_t stringOffset = read_16u(data + 4);
+		uint32_t count;
+		count = read_16u(data + 2);
+		uint32_t stringOffset;
+		stringOffset = read_16u(data + 4);
 		if (length < 6 + 12 * count) goto TABLE_NAME_CORRUPTED;
 
 		name = table_iName.create();

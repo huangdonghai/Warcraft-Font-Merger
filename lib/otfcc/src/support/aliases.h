@@ -36,7 +36,7 @@
 	for (size_t index = 0, keep = 1; keep && index < (vector).length; keep = !keep, index++)       \
 		for (item = (vector).items + index; keep; keep = !keep)
 #define foreach(item, vector) foreach_index(item, __caryll_index, vector)
-#define foreach_hash(id, range) for (id = (range); id != NULL; id = id->hh.next)
+#define foreach_hash(id, range) for (id = (range); id != NULL; id = (decltype(id))id->hh.next)
 
 typedef uint8_t *font_file_pointer;
 

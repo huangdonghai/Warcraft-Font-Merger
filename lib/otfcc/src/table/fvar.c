@@ -100,15 +100,19 @@ table_fvar *otfcc_readFvar(const otfcc_Packet packet, const otfcc_Options *optio
 		font_file_pointer data = table.data;
 		if (table.length < sizeof(struct FVARHeader)) goto FAIL;
 
-		struct FVARHeader *header = (struct FVARHeader *)data;
+		struct FVARHeader *header;
+		header = (struct FVARHeader *)data;
 		if (be16(header->majorVersion) != 1) goto FAIL;
 		if (be16(header->minorVersion) != 0) goto FAIL;
 		if (be16(header->axesArrayOffset) == 0) goto FAIL;
 		if (be16(header->axisCount) == 0) goto FAIL;
 		if (be16(header->axisSize) != sizeof(struct VariationAxisRecord)) goto FAIL;
-		uint16_t nAxes = be16(header->axisCount);
-		uint16_t instanceSizeWithoutPSNID = 4 + nAxes * sizeof(f16dot16);
-		uint16_t instanceSizeWithPSNID = 2 + instanceSizeWithoutPSNID;
+		uint16_t nAxes;
+		nAxes = be16(header->axisCount);
+		uint16_t instanceSizeWithoutPSNID;
+		instanceSizeWithoutPSNID = 4 + nAxes * sizeof(f16dot16);
+		uint16_t instanceSizeWithPSNID;
+		instanceSizeWithPSNID = 2 + instanceSizeWithoutPSNID;
 		if (be16(header->instanceSize) != instanceSizeWithoutPSNID &&
 		    be16(header->instanceSize) != instanceSizeWithPSNID)
 			goto FAIL;
@@ -120,8 +124,8 @@ table_fvar *otfcc_readFvar(const otfcc_Packet packet, const otfcc_Options *optio
 		fvar = table_iFvar.create();
 
 		// parse axes
-		struct VariationAxisRecord *axisRecord =
-		    (struct VariationAxisRecord *)(data + be16(header->axesArrayOffset));
+		struct VariationAxisRecord *axisRecord;
+		axisRecord = (struct VariationAxisRecord *)(data + be16(header->axesArrayOffset));
 		for (uint16_t j = 0; j < nAxes; j++) {
 			vf_Axis axis = {.tag = be32(axisRecord->axisTag),
 			                .minValue = otfcc_from_fixed(be32(axisRecord->minValue)),
@@ -134,9 +138,12 @@ table_fvar *otfcc_readFvar(const otfcc_Packet packet, const otfcc_Options *optio
 		}
 
 		// parse instances
-		uint16_t nInstances = be16(header->instanceCount);
-		bool hasPostscriptNameID = be16(header->instanceSize) == instanceSizeWithPSNID;
-		struct InstanceRecord *instance = (struct InstanceRecord *)axisRecord;
+		uint16_t nInstances;
+		nInstances = be16(header->instanceCount);
+		bool hasPostscriptNameID;
+		hasPostscriptNameID = be16(header->instanceSize) == instanceSizeWithPSNID;
+		struct InstanceRecord *instance;
+		instance = (struct InstanceRecord *)axisRecord;
 		for (uint16_t j = 0; j < nInstances; j++) {
 			fvar_Instance inst;
 			fvar_iInstance.init(&inst);
@@ -217,7 +224,7 @@ json_value *json_new_VQSegment(const vq_Segment *s, const table_fvar *fvar) {
 	switch (s->type) {
 		case VQ_STILL:;
 			return json_new_position(s->val.still);
-		case VQ_DELTA:;
+		case VQ_DELTA: {
 			json_value *d = json_object_new(3);
 			json_object_push(d, "delta", json_new_position(s->val.delta.quantity));
 			if (!s->val.delta.touched) {
@@ -225,6 +232,7 @@ json_value *json_new_VQSegment(const vq_Segment *s, const table_fvar *fvar) {
 			}
 			json_object_push(d, "on", json_new_VQRegion(s->val.delta.region, fvar));
 			return d;
+		}
 		default:;
 			return json_integer_new(0);
 	}

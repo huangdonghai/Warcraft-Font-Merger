@@ -28,7 +28,8 @@ otl_Subtable *otl_read_gsub_single(const font_file_pointer data, uint32_t tableL
 	otl_Coverage *to = NULL;
 	if (tableLength < subtableOffset + 6) goto FAIL;
 
-	uint16_t subtableFormat = read_16u(data + subtableOffset);
+	uint16_t subtableFormat;
+	subtableFormat = read_16u(data + subtableOffset);
 	from = Coverage.read(data, tableLength, subtableOffset + read_16u(data + subtableOffset + 2));
 	if (!from || from->numGlyphs == 0) goto FAIL;
 

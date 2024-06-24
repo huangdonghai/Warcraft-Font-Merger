@@ -92,7 +92,8 @@ static otl_BuildHeuristics getLookupHeuristics(const table_OTL *table, const otl
 			const otl_Feature *fea = table->features.items[j];
 			if (featureNameToTag(fea->name) != 'vert') continue;
 			for (tableid_t k = 0; k < fea->lookups.length; k++) {
-				if (fea->lookups.items[k] == lut) heu |= OTL_BH_GSUB_VERT;
+				if (fea->lookups.items[k] == lut)
+					heu = (otl_BuildHeuristics)(heu | OTL_BH_GSUB_VERT);
 			}
 		}
 	}

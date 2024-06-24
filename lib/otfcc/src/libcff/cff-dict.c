@@ -1,4 +1,5 @@
 #include "libcff.h"
+#include "libcff/cff-value.h"
 
 static INLINE void disposeDict(cff_Dict *dict) {
 	for (uint32_t j = 0; j < dict->count; j++) {
@@ -87,7 +88,7 @@ static cff_Value parseDictKey(const uint8_t *data, const uint32_t len, const uin
 	context.found = false;
 	context.idx = idx;
 	context.op = op;
-	context.res.t = 0;
+	context.res.t = cff_Value_Type::invalid;
 	context.res.i = -1;
 
 	parseToCallback(data, len, &context, callback_get_key);

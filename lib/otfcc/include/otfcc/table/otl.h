@@ -28,7 +28,7 @@ typedef enum {
 	otl_type_gpos_markToMark = 0x26,
 	otl_type_gpos_context = 0x27,
 	otl_type_gpos_chaining = 0x28,
-	otl_type_gpos_extend = 0x29
+	otl_type_gpos_extend = 0x29,
 } otl_LookupType;
 
 typedef union _otl_subtable otl_Subtable;

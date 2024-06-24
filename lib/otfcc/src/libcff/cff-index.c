@@ -141,6 +141,6 @@ static caryll_Buffer *buildIndex(const cff_Index *index) {
 }
 
 caryll_ElementInterfaceOf(cff_Index) cff_iIndex = {
-    caryll_standardRefTypeMethods(cff_Index), .getLength = getIndexLength, .empty = emptyIndex, .parse = extractIndex,
+    caryll_standardRefTypeMethods(cff_Index), .empty = emptyIndex, .getLength = getIndexLength, .parse = extractIndex,
     .fromCallback = newIndexByCallback,       .build = buildIndex,
 };

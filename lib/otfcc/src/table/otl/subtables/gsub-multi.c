@@ -18,7 +18,8 @@ otl_Subtable *otl_read_gsub_multi(font_file_pointer data, uint32_t tableLength, 
 	checkLength(offset + 6);
 
 	from = Coverage.read(data, tableLength, offset + read_16u(data + offset + 2));
-	glyphid_t seqCount = read_16u(data + offset + 4);
+	glyphid_t seqCount;
+	seqCount = read_16u(data + offset + 4);
 	if (seqCount != from->numGlyphs) goto FAIL;
 	checkLength(offset + 6 + seqCount * 2);
 

@@ -28,7 +28,8 @@ target("otfccbuild")
 	add_deps("config", "otfcc")
 	add_files(
 		"src/otfcc-driver/otfccbuild.c",
-		"src/otfcc-driver/stopwatch.c")
+		"src/otfcc-driver/stopwatch.c",
+		{sourcekind = "cxx"})
 
 target("otfccdump")
 	set_kind("binary")
@@ -36,7 +37,8 @@ target("otfccdump")
 	add_deps("config", "otfcc")
 	add_files(
 		"src/otfcc-driver/otfccdump.c",
-		"src/otfcc-driver/stopwatch.c")
+		"src/otfcc-driver/stopwatch.c",
+		{sourcekind = "cxx"})
 
 target("config")
 	set_kind("phony")

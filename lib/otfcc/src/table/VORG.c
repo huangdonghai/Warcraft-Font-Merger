@@ -13,10 +13,12 @@ table_VORG *otfcc_readVORG(const otfcc_Packet packet, const otfcc_Options *optio
 		font_file_pointer data = table.data;
 		uint32_t length = table.length;
 		if (length < 8) goto VORG_CORRUPTED;
-		uint16_t numVertOriginYMetrics = read_16u(data + 6);
+		uint16_t numVertOriginYMetrics;
+		numVertOriginYMetrics = read_16u(data + 6);
 		if (length < 8 + 4 * numVertOriginYMetrics) goto VORG_CORRUPTED;
 
-		table_VORG *vorg = table_iVORG.create();
+		table_VORG *vorg;
+		vorg = table_iVORG.create();
 		vorg->defaultVerticalOrigin = read_16s(data + 4);
 		vorg->numVertOriginYMetrics = numVertOriginYMetrics;
 		NEW(vorg->entries, numVertOriginYMetrics);

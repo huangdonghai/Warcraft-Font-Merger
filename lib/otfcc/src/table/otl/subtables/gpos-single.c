@@ -19,7 +19,8 @@ otl_Subtable *otl_read_gpos_single(const font_file_pointer data, uint32_t tableL
 
 	checkLength(offset + 6);
 
-	uint16_t subtableFormat = read_16u(data + offset);
+	uint16_t subtableFormat;
+	subtableFormat = read_16u(data + offset);
 	targets = Coverage.read(data, tableLength, offset + read_16u(data + offset + 2));
 	if (!targets || targets->numGlyphs == 0) goto FAIL;
 

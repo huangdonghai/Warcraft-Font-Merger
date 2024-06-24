@@ -28,7 +28,8 @@ table_gasp *otfcc_readGasp(const otfcc_Packet packet, const otfcc_Options *optio
 		if (length < 4) { goto FAIL; }
 		gasp = table_iGasp.create();
 		gasp->version = read_16u(data);
-		tableid_t numRanges = read_16u(data + 2);
+		tableid_t numRanges;
+		numRanges = read_16u(data + 2);
 		if (length < 4 + numRanges * 4) { goto FAIL; }
 
 		for (uint32_t j = 0; j < numRanges; j++) {

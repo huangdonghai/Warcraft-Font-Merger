@@ -40,10 +40,12 @@ otl_Subtable *otl_read_gpos_markToLigature(const font_file_pointer data, uint32_
 	if (!marks || marks->numGlyphs == 0 || !bases || bases->numGlyphs == 0) goto FAIL;
 	subtable->classCount = read_16u(data + offset + 6);
 
-	uint32_t markArrayOffset = offset + read_16u(data + offset + 8);
+	uint32_t markArrayOffset;
+	markArrayOffset = offset + read_16u(data + offset + 8);
 	otl_readMarkArray(&subtable->markArray, marks, data, tableLength, markArrayOffset);
 
-	uint32_t ligArrayOffset = offset + read_16u(data + offset + 10);
+	uint32_t ligArrayOffset;
+	ligArrayOffset = offset + read_16u(data + offset + 10);
 	checkLength(ligArrayOffset + 2 + 2 * bases->numGlyphs);
 	if (read_16u(data + ligArrayOffset) != bases->numGlyphs) goto FAIL;
 

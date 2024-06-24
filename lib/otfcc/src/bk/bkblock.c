@@ -65,7 +65,7 @@ static void vbkpushitems(bk_Block *b, bk_CellType type0, va_list ap) {
 			bk_Block *par = va_arg(ap, bk_Block *);
 			bkblock_pushptr(b, curtype, par);
 		}
-		curtype = va_arg(ap, int);
+		curtype = (bk_CellType)va_arg(ap, int);
 	}
 }
 
@@ -73,7 +73,7 @@ bk_Block *bk_new_Block(int type0, ...) {
 	va_list ap;
 	va_start(ap, type0);
 	bk_Block *b = _bkblock_init();
-	vbkpushitems(b, type0, ap);
+	vbkpushitems(b, (bk_CellType)type0, ap);
 	va_end(ap);
 	return b;
 }
@@ -81,7 +81,7 @@ bk_Block *bk_new_Block(int type0, ...) {
 bk_Block *bk_push(bk_Block *b, int type0, ...) {
 	va_list ap;
 	va_start(ap, type0);
-	vbkpushitems(b, type0, ap);
+	vbkpushitems(b, (bk_CellType)type0, ap);
 	va_end(ap);
 	return b;
 }

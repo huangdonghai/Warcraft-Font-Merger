@@ -38,10 +38,14 @@ table_COLR *otfcc_readCOLR(const otfcc_Packet packet, const otfcc_Options *optio
 	table_COLR *colr = NULL;
 	FOR_TABLE('COLR', table) {
 		if (table.length < 14) goto FAIL;
-		uint16_t numBaseGlyphRecords = read_16u(table.data + 2);
-		uint16_t numLayerRecords = read_16u(table.data + 12);
-		uint32_t offsetBaseGlyphRecord = read_32u(table.data + 4);
-		uint32_t offsetLayerRecord = read_32u(table.data + 8);
+		uint16_t numBaseGlyphRecords;
+		numBaseGlyphRecords = read_16u(table.data + 2);
+		uint16_t numLayerRecords;
+		numLayerRecords = read_16u(table.data + 12);
+		uint32_t offsetBaseGlyphRecord;
+		offsetBaseGlyphRecord = read_32u(table.data + 4);
+		uint32_t offsetLayerRecord;
+		offsetLayerRecord = read_32u(table.data + 8);
 		if (table.length < offsetBaseGlyphRecord + baseGlyphRecLength * numBaseGlyphRecords)
 			goto FAIL;
 		if (table.length < offsetLayerRecord + layerRecLength * numLayerRecords) goto FAIL;

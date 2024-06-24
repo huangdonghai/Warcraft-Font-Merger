@@ -73,7 +73,7 @@ void readEntireFile(char *inPath, char **_buffer, long *_length) {
 	fseek(f, 0, SEEK_END);
 	length = ftell(f);
 	fseek(f, 0, SEEK_SET);
-	buffer = malloc(length);
+	buffer = (char *)malloc(length);
 	if (buffer) { fread(buffer, 1, length, f); }
 	fclose(f);
 
@@ -91,13 +91,13 @@ void readEntireStdin(char **_buffer, long *_length) {
 #endif
 	static const long BUF_SIZE = 0x400000;
 	static const long BUF_MIN = 0x1000;
-	char *buffer = malloc(BUF_SIZE);
+	char *buffer = (char *)malloc(BUF_SIZE);
 	long length = 0;
 	long remain = BUF_SIZE;
 	while (!feof(stdin)) {
 		if (remain <= BUF_MIN) {
 			remain += (length >> 1) & 0xFFFFFF;
-			buffer = realloc(buffer, length + remain);
+			buffer = (char *)realloc(buffer, length + remain);
 		}
 
 		fgets(buffer + length, remain, stdin);

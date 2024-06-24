@@ -6,9 +6,12 @@ table_meta *otfcc_readMeta(const otfcc_Packet packet, const otfcc_Options *optio
 	table_meta *meta = NULL;
 	FOR_TABLE('meta', table) {
 		if (table.length < 16) goto FAIL;
-		uint32_t version = read_32u(table.data + 0);
-		uint32_t flags = read_32u(table.data + 4);
-		uint32_t dataMapsCount = read_32u(table.data + 12);
+		uint32_t version;
+		version = read_32u(table.data + 0);
+		uint32_t flags;
+		flags = read_32u(table.data + 4);
+		uint32_t dataMapsCount;
+		dataMapsCount = read_32u(table.data + 12);
 		if (table.length < 16 + 12 * dataMapsCount) goto FAIL;
 
 		meta = table_iMeta.create();

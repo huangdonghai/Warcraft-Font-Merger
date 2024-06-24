@@ -74,7 +74,7 @@ static void loggerLogSDS(otfcc_ILogger *_self, uint8_t verbosity, otfcc_LoggerTy
 	}
 	sdsfree(data);
 	if (verbosity <= self->verbosityLimit) {
-		_self->getTarget(_self)->push(self->target, demand);
+		_self->getTarget(_self)->push((otfcc_ILoggerTarget *)self->target, demand);
 		self->lastLoggedLevel = self->level;
 	} else {
 		sdsfree(demand);
@@ -112,8 +112,8 @@ const otfcc_ILogger VTABLE_LOGGER = {.dispose = loggerDispose,
                                      .logSDS = loggerLogSDS,
                                      .dedent = loggerDedent,
                                      .finish = loggerFinish,
-                                     .getTarget = loggerGetTarget,
-                                     .setVerbosity = loggerSetVerbosity};
+                                     .setVerbosity = loggerSetVerbosity,
+                                     .getTarget = loggerGetTarget};
 
 otfcc_ILogger *otfcc_newLogger(otfcc_ILoggerTarget *target) {
 	Logger *logger;

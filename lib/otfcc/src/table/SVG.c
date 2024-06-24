@@ -22,9 +22,11 @@ table_SVG *otfcc_readSVG(const otfcc_Packet packet, const otfcc_Options *options
 	table_SVG *svg = NULL;
 	FOR_TABLE('SVG ', table) {
 		if (table.length < 10) goto FAIL;
-		uint32_t offsetToSVGDocIndex = read_32u(table.data + 2);
+		uint32_t offsetToSVGDocIndex;
+		offsetToSVGDocIndex = read_32u(table.data + 2);
 		if (table.length < offsetToSVGDocIndex + 2) goto FAIL;
-		uint16_t numEntries = read_16u(table.data + offsetToSVGDocIndex);
+		uint16_t numEntries;
+		numEntries = read_16u(table.data + offsetToSVGDocIndex);
 		if (table.length < offsetToSVGDocIndex + 2 + 12 * numEntries) goto FAIL;
 
 		svg = table_iSVG.create();

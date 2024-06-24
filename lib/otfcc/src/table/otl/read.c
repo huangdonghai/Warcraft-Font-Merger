@@ -1,3 +1,4 @@
+#include "otfcc/table/otl.h"
 #include "private.h"
 
 #define LOOKUP_READER(llt, fn)                                                                     \
@@ -33,13 +34,15 @@ otl_Subtable *otfcc_readOtl_subtable(font_file_pointer data, uint32_t tableLengt
 static void parseLanguage(font_file_pointer data, uint32_t tableLength, uint32_t base,
                           otl_LanguageSystem *lang, otl_FeatureList *features) {
 	checkLength(base + 6);
-	tableid_t rid = read_16u(data + base + 2);
+	tableid_t rid;
+	rid = read_16u(data + base + 2);
 	if (rid < features->length) {
 		lang->requiredFeature = features->items[rid];
 	} else {
 		lang->requiredFeature = NULL;
 	}
-	tableid_t featureCount = read_16u(data + base + 4);
+	tableid_t featureCount;
+	featureCount = read_16u(data + base + 4);
 	for (tableid_t j = 0; j < featureCount; j++) {
 		tableid_t featureIndex = read_16u(data + base + 6 + 2 * j);
 		if (featureIndex < features->length) {
@@ -59,11 +62,14 @@ static table_OTL *otfcc_readOtl_common(font_file_pointer data, uint32_t tableLen
 	table_OTL *table = table_iOTL.create();
 	if (!table) goto FAIL;
 	checkLength(10);
-	uint32_t scriptListOffset = read_16u(data + 4);
+	uint32_t scriptListOffset;
+	scriptListOffset = read_16u(data + 4);
 	checkLength(scriptListOffset + 2);
-	uint32_t featureListOffset = read_16u(data + 6);
+	uint32_t featureListOffset;
+	featureListOffset = read_16u(data + 6);
 	checkLength(featureListOffset + 2);
-	uint32_t lookupListOffset = read_16u(data + 8);
+	uint32_t lookupListOffset;
+	lookupListOffset = read_16u(data + 8);
 	checkLength(lookupListOffset + 2);
 
 	// parse lookup list
@@ -75,7 +81,7 @@ static table_OTL *otfcc_readOtl_common(font_file_pointer data, uint32_t tableLen
 			otl_iLookupPtr.init(&lookup);
 			lookup->_offset = lookupListOffset + read_16u(data + lookupListOffset + 2 + 2 * j);
 			checkLength(lookup->_offset + 6);
-			lookup->type = read_16u(data + lookup->_offset) + lookup_type_base;
+			lookup->type = (otl_LookupType)(read_16u(data + lookup->_offset) + lookup_type_base);
 			otl_iLookupList.push(&table->lookups, lookup);
 		}
 	}
@@ -208,7 +214,7 @@ static void otfcc_readOtl_lookup(font_file_pointer data, uint32_t tableLength, o
 		otl_iSubtableList.push(&lookup->subtables, subtable);
 	}
 	if (lookup->type == otl_type_gsub_extend || lookup->type == otl_type_gpos_extend) {
-		lookup->type = 0;
+		lookup->type = otl_type_unknown;
 		for (tableid_t j = 0; j < lookup->subtables.length; j++) {
 			if (lookup->subtables.items[j]) {
 				lookup->type = lookup->subtables.items[j]->extend.type;

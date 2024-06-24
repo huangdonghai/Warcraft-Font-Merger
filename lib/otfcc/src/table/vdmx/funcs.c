@@ -7,8 +7,10 @@ table_VDMX *otfcc_readVDMX(const otfcc_Packet packet, const otfcc_Options *optio
 	table_VDMX *vdmx = NULL;
 	FOR_TABLE('VDMX', table) {
 		if (table.length < 6) goto FAIL;
-		uint16_t version = read_16u(table.data + 0);
-		uint16_t numRatios = read_16u(table.data + 4);
+		uint16_t version;
+		version = read_16u(table.data + 0);
+		uint16_t numRatios;
+		numRatios = read_16u(table.data + 4);
 		if (table.length < 6 + 6 * numRatios) goto FAIL;
 
 		vdmx = table_iVDMX.create();

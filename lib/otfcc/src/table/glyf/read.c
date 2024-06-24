@@ -618,13 +618,13 @@ static INLINE void polymorphize(const otfcc_Packet packet, const otfcc_Options *
 		};
 		for (glyphid_t j = 0; j < glyf->length; j++) {
 			TuplePolymorphizerCtx tpctx = {.fvar = ctx->fvar,
-			                               .dimensions = ctx->fvar->axes.length,
-			                               .nPhantomPoints = ctx->nPhantomPoints,
+			                               .dimensions = (uint16_t)ctx->fvar->axes.length,
 			                               .sharedTupleCount = be16(header->sharedTupleCount),
 			                               .sharedTuples =
 			                                   (f2dot14 *)(data + be32(header->sharedTuplesOffset)),
 			                               .coordDimensions = 2,
-			                               .allowIUP = glyf->items[j]->contours.length > 0};
+			                               .allowIUP = glyf->items[j]->contours.length > 0,
+			                               .nPhantomPoints = ctx->nPhantomPoints};
 			uint32_t glyphVariationDataOffset = 0;
 			if (be16(header->flags) & GVAR_OFFSETS_ARE_LONG) {
 				glyphVariationDataOffset =
@@ -648,7 +648,8 @@ table_glyf *otfcc_readGlyf(const otfcc_Packet packet, const otfcc_Options *optio
 
 	NEW_CLEAN_N(offsets, (ctx->numGlyphs + 1));
 	if (!offsets) goto ABSENT;
-	bool foundLoca = false;
+	bool foundLoca;
+	foundLoca = false;
 
 	// read loca
 	FOR_TABLE('loca', table) {

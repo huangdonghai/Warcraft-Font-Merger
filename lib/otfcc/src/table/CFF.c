@@ -1087,7 +1087,7 @@ static int by_sid(cff_sid_entry *a, cff_sid_entry *b) {
 	return a->sid - b->sid;
 }
 static caryll_Buffer *callback_makestringindex(void *context, uint32_t i) {
-	caryll_Buffer **blobs = context;
+	caryll_Buffer **blobs = (caryll_Buffer **)context;
 	return blobs[i];
 }
 static caryll_Buffer *cffstrings_to_indexblob(cff_sid_entry **h) {
@@ -1171,7 +1171,8 @@ static caryll_Buffer *cff_make_fdselect(table_CFF *cff, table_glyf *glyf) {
 	NEW(fds);
 	fds->t = cff_FDSELECT_UNSPECED;
 	if (!glyf->length) goto done;
-	uint8_t fdi0 = glyf->items[0]->fdSelect.index;
+	uint8_t fdi0;
+	fdi0 = glyf->items[0]->fdSelect.index;
 	if (fdi0 > cff->fdArrayCount) fdi0 = 0;
 	current = fdi0;
 	for (glyphid_t j = 1; j < glyf->length; j++) {

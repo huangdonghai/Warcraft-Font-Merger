@@ -129,7 +129,7 @@
 	caryll_trivialReplace(T);
 
 #define caryll_standardTypeMethods(T)                                                              \
-	.init = T##_init, .copy = T##_copy, .dispose = T##_dispose, .move = T##_move,                  \
+	.init = T##_init, .copy = T##_copy, .move = T##_move, .dispose = T##_dispose,                  \
 	.replace = T##_replace, .copyReplace = T##_copyReplace
 #define caryll_standardRefTypeMethods(T)                                                           \
 	caryll_standardTypeMethods(T), .create = T##_create, .free = T##_free
@@ -208,7 +208,7 @@
 		return !(_fnCompare)(a, b);                                                                \
 	}
 #define caryll_OrdEqAssigns(T)                                                                     \
-	.compare = T##_compare, .compareRef = T##_compareRef, .equal = T##_equal
+	.equal = T##_equal, .compare = T##_compare, .compareRef = T##_compareRef
 
 // Monoid
 #define caryll_MonoidFns(T, _fn_neutral, _fn_inplacePlus)                                          \
@@ -225,7 +225,7 @@
 		return result;                                                                             \
 	}
 #define caryll_MonoidAssigns(T)                                                                    \
-	.neutral = T##_neutral, .inplacePlus = T##_inplacePlus, .plus = T##_plus
+	.neutral = T##_neutral, .plus = T##_plus, .inplacePlus = T##_inplacePlus
 
 // Group
 #define caryll_GroupFns(T, _fn_inplaceNegate)                                                      \
@@ -270,6 +270,6 @@
 		T##_dispose(&x);                                                                           \
 	}
 #define caryll_ModuleAssigns(T)                                                                    \
-	.inplaceScale = T##_inplaceScale, .scale = T##_scale, .inplacePlusScale = T##_inplacePlusScale
+	.inplaceScale = T##_inplaceScale, .inplacePlusScale = T##_inplacePlusScale, .scale = T##_scale
 
 #endif

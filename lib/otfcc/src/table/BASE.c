@@ -32,7 +32,8 @@ static void readBaseScript(const font_file_pointer data, uint32_t tableLength, u
 	entry->baseValues = NULL;
 	entry->defaultBaselineTag = 0;
 	checkLength(offset + 2); // care about base values only now
-	uint16_t baseValuesOffset = read_16u(data + offset);
+	uint16_t baseValuesOffset;
+	baseValuesOffset = read_16u(data + offset);
 	if (baseValuesOffset) {
 		baseValuesOffset += offset;
 		checkLength(baseValuesOffset + 4);
@@ -68,10 +69,12 @@ static otl_BaseAxis *readAxis(font_file_pointer data, uint32_t tableLength, uint
 	checkLength(offset + 4);
 
 	// Read BaseTagList
-	uint16_t baseTagListOffset = offset + read_16u(data + offset);
+	uint16_t baseTagListOffset;
+	baseTagListOffset = offset + read_16u(data + offset);
 	if (baseTagListOffset <= offset) goto FAIL;
 	checkLength(baseTagListOffset + 2);
-	uint16_t nBaseTags = read_16u(data + baseTagListOffset);
+	uint16_t nBaseTags;
+	nBaseTags = read_16u(data + baseTagListOffset);
 	if (!nBaseTags) goto FAIL;
 	checkLength(baseTagListOffset + 2 + 4 * nBaseTags);
 	NEW(baseTagList, nBaseTags);
@@ -79,10 +82,12 @@ static otl_BaseAxis *readAxis(font_file_pointer data, uint32_t tableLength, uint
 		baseTagList[j] = read_32u(data + baseTagListOffset + 2 + j * 4);
 	}
 
-	uint16_t baseScriptListOffset = offset + read_16u(data + offset + 2);
+	uint16_t baseScriptListOffset;
+	baseScriptListOffset = offset + read_16u(data + offset + 2);
 	if (baseScriptListOffset <= offset) goto FAIL;
 	checkLength(baseScriptListOffset + 2);
-	tableid_t nBaseScripts = read_16u(data + baseScriptListOffset);
+	tableid_t nBaseScripts;
+	nBaseScripts = read_16u(data + baseScriptListOffset);
 	checkLength(baseScriptListOffset + 2 + 6 * nBaseScripts);
 	NEW(axis);
 	axis->scriptCount = nBaseScripts;
@@ -114,9 +119,11 @@ table_BASE *otfcc_readBASE(const otfcc_Packet packet, const otfcc_Options *optio
 		uint32_t tableLength = table.length;
 		checkLength(8);
 		NEW(base);
-		uint16_t offsetH = read_16u(data + 4);
+		uint16_t offsetH;
+		offsetH = read_16u(data + 4);
 		if (offsetH) base->horizontal = readAxis(data, tableLength, offsetH);
-		uint16_t offsetV = read_16u(data + 6);
+		uint16_t offsetV;
+		offsetV = read_16u(data + 6);
 		if (offsetV) base->vertical = readAxis(data, tableLength, offsetV);
 		return base;
 	FAIL:

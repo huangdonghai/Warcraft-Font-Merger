@@ -212,7 +212,7 @@ uint8_t *utf8toutf16be(sds _in, size_t *out_bytes) {
 			wordsNeeded += 2;
 		}
 	}
-	uint8_t *_out = malloc(2 * wordsNeeded * sizeof(uint8_t));
+	uint8_t *_out = (uint8_t *)malloc(2 * wordsNeeded * sizeof(uint8_t));
 	uint8_t *out = _out;
 	in = _in;
 	while (in < inend) {

@@ -16,14 +16,16 @@ otl_Subtable *otl_read_gsub_ligature(const font_file_pointer data, uint32_t tabl
 	subtable_gsub_ligature *subtable = iSubtable_gsub_ligature.create();
 	checkLength(offset + 6);
 
-	otl_Coverage *startCoverage =
-	    Coverage.read(data, tableLength, offset + read_16u(data + offset + 2));
+	otl_Coverage *startCoverage;
+	startCoverage = Coverage.read(data, tableLength, offset + read_16u(data + offset + 2));
 	if (!startCoverage) goto FAIL;
-	glyphid_t setCount = read_16u(data + offset + 4);
+	glyphid_t setCount;
+	setCount = read_16u(data + offset + 4);
 	if (setCount != startCoverage->numGlyphs) goto FAIL;
 	checkLength(offset + 6 + setCount * 2);
 
-	uint32_t ligatureCount = 0;
+	uint32_t ligatureCount;
+	ligatureCount = 0;
 	for (glyphid_t j = 0; j < setCount; j++) {
 		uint32_t setOffset = offset + read_16u(data + offset + 6 + j * 2);
 		checkLength(setOffset + 2);
@@ -88,8 +90,8 @@ otl_Subtable *otl_gsub_parse_ligature(const json_value *_subtable, const otfcc_O
 			if (!_from || !_to) continue;
 			iSubtable_gsub_ligature.push(
 			    st, ((otl_GsubLigatureEntry){
-			            .to = Handle.fromName(sdsnewlen(_to->u.string.ptr, _to->u.string.length)),
 			            .from = Coverage.parse(_from),
+			            .to = Handle.fromName(sdsnewlen(_to->u.string.ptr, _to->u.string.length)),
 			        }));
 		}
 		return (otl_Subtable *)st;
@@ -102,9 +104,9 @@ otl_Subtable *otl_gsub_parse_ligature(const json_value *_subtable, const otfcc_O
 			if (!_from || _from->type != json_array) continue;
 			iSubtable_gsub_ligature.push(
 			    st, ((otl_GsubLigatureEntry){
+			            .from = Coverage.parse(_from),
 			            .to = Handle.fromName(sdsnewlen(_subtable->u.object.values[k].name,
 			                                            _subtable->u.object.values[k].name_length)),
-			            .from = Coverage.parse(_from),
 			        }));
 		}
 		return (otl_Subtable *)st;

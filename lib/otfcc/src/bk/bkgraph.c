@@ -35,14 +35,14 @@ static uint32_t dfs_insert_cells(bk_Block *b, bk_Graph *f, uint32_t *order) {
 }
 
 static int _by_height(const void *_a, const void *_b) {
-	const bk_GraphNode *a = _a;
-	const bk_GraphNode *b = _b;
+	const bk_GraphNode *a = (const bk_GraphNode *)_a;
+	const bk_GraphNode *b = (const bk_GraphNode *)_b;
 	return a->height == b->height ? a->order - b->order : b->height - a->height;
 }
 
 static int _by_order(const void *_a, const void *_b) {
-	const bk_GraphNode *a = _a;
-	const bk_GraphNode *b = _b;
+	const bk_GraphNode *a = (const bk_GraphNode *)_a;
+	const bk_GraphNode *b = (const bk_GraphNode *)_b;
 	return a->block && b->block && a->block->_visitstate != b->block->_visitstate // Visited first
 	           ? b->block->_visitstate - a->block->_visitstate
 	           : a->block && b->block && a->block->_depth != b->block->_depth // By depth

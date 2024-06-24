@@ -22,7 +22,8 @@ otl_Subtable *otl_read_gpos_cursive(const font_file_pointer data, uint32_t table
 	targets = Coverage.read(data, tableLength, offset + read_16u(data + offset + 2));
 	if (!targets || targets->numGlyphs == 0) goto FAIL;
 
-	glyphid_t valueCount = read_16u(data + offset + 4);
+	glyphid_t valueCount;
+	valueCount = read_16u(data + offset + 4);
 	checkLength(offset + 6 + 4 * valueCount);
 	if (valueCount != targets->numGlyphs) goto FAIL;
 

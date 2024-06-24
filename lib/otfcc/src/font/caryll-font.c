@@ -160,7 +160,7 @@ caryll_standardRefTypeFn(otfcc_Font, initFont, disposeFont);
 
 caryll_ElementInterfaceOf(otfcc_Font) otfcc_iFont = {
     caryll_standardRefTypeMethods(otfcc_Font),
+    .consolidate = otfcc_consolidateFont,
     .createTable = createFontTable,
     .deleteTable = deleteFontTable,
-    .consolidate = otfcc_consolidateFont,
 };

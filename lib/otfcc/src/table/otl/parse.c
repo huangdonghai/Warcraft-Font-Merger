@@ -307,9 +307,12 @@ table_OTL *otfcc_parseOtl(const json_value *root, const otfcc_Options *options, 
 	json_value *table = json_obj_get_type(root, tag, json_object);
 	if (!table) goto FAIL;
 	otl = table_iOTL.create();
-	json_value *languages = json_obj_get_type(table, "languages", json_object);
-	json_value *features = json_obj_get_type(table, "features", json_object);
-	json_value *lookups = json_obj_get_type(table, "lookups", json_object);
+	json_value *languages;
+	languages = json_obj_get_type(table, "languages", json_object);
+	json_value *features;
+	features = json_obj_get_type(table, "features", json_object);
+	json_value *lookups;
+	lookups = json_obj_get_type(table, "lookups", json_object);
 	if (!languages || !features || !lookups) goto FAIL;
 
 	loggedStep("%s", tag) {

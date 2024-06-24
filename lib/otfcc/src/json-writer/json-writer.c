@@ -1,5 +1,5 @@
-#include "support/util.h"
 #include "otfcc/font.h"
+#include "support/util.h"
 #include "table/all.h"
 
 static void *serializeToJson(otfcc_Font *font, const otfcc_Options *options) {
@@ -17,12 +17,12 @@ static void *serializeToJson(otfcc_Font *font, const otfcc_Options *options) {
 	otfcc_dumpCmap(font->cmap, root, options);
 	otfcc_dumpCFF(font->CFF_, root, options);
 
-	GlyfIOContext ctx = {.locaIsLong = font->head->indexToLocFormat,
+	GlyfIOContext ctx = {.locaIsLong = bool(font->head->indexToLocFormat),
 	                     .numGlyphs = font->maxp->numGlyphs,
 	                     .nPhantomPoints = 4,
+	                     .fvar = font->fvar,
 	                     .hasVerticalMetrics = !!(font->vhea),
-	                     .exportFDSelect = font->CFF_ && font->CFF_->isCID,
-	                     .fvar = font->fvar};
+	                     .exportFDSelect = font->CFF_ && font->CFF_->isCID};
 	otfcc_dumpGlyf(font->glyf, root, options, &ctx);
 	if (!options->ignore_hints) {
 		table_dumpTableFpgmPrep(font->fpgm, root, options, "fpgm");
