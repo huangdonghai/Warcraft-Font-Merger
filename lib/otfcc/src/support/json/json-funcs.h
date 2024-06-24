@@ -4,9 +4,9 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "dep/json-builder.h"
-#include "dep/json.h"
-#include "dep/sds.h"
+#include "json-builder.h"
+#include "json.h"
+#include "sds.h"
 
 #include "caryll/ownership.h"
 #include "otfcc/primitives.h"

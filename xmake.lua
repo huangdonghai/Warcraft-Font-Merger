@@ -25,7 +25,7 @@ target("merge-otd")
 target("otfccbuild")
 	set_kind("binary")
 	add_rules("static_binary")
-	add_deps("config", "otfcc", "otfcc-extern")
+	add_deps("config", "otfcc")
 	add_files(
 		"src/otfcc-driver/otfccbuild.c",
 		"src/otfcc-driver/stopwatch.c")
@@ -33,7 +33,7 @@ target("otfccbuild")
 target("otfccdump")
 	set_kind("binary")
 	add_rules("static_binary")
-	add_deps("config", "otfcc", "otfcc-extern")
+	add_deps("config", "otfcc")
 	add_files(
 		"src/otfcc-driver/otfccdump.c",
 		"src/otfcc-driver/stopwatch.c")
@@ -46,6 +46,9 @@ target("config")
 
 includes("3rdparty/clipp")
 includes("3rdparty/json")
+includes("3rdparty/json-builder")
+includes("3rdparty/json-parser")
 includes("3rdparty/nowide")
+includes("3rdparty/sds")
+includes("3rdparty/uthash")
 includes("lib/otfcc")
-includes("lib/otfcc-extern")

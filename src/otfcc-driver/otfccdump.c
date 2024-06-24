@@ -1,4 +1,4 @@
-#include "dep/json-builder.h"
+#include "json-builder.h"
 #include "otfcc/sfnt.h"
 #include "otfcc/font.h"
 

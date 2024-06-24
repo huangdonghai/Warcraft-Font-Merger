@@ -13,10 +13,10 @@
 #include <string.h>
 #include <math.h>
 
-#include "dep/json-builder.h"
-#include "dep/json.h"
-#include "dep/sds.h"
-#include "dep/uthash.h"
+#include "json-builder.h"
+#include "json.h"
+#include "sds.h"
+#include "uthash.h"
 
 #include "caryll/ownership.h"
 #include "caryll/buffer.h"

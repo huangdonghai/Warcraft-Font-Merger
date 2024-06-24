@@ -1,0 +1,5 @@
+target("json-builder")
+	set_kind("static")
+	add_deps("json-parser")
+	add_files("src/json-builder.c")
+	add_includedirs("include", {public = true})
