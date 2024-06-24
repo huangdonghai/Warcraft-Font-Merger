@@ -2,17 +2,12 @@
 
 set -e
 
-cmake . -B build/ \
-	-DCMAKE_BUILD_TYPE="Release" \
-	-DCMAKE_INTERPROCEDURAL_OPTIMIZATION:BOOL="ON" \
-	-DCMAKE_C_COMPILER="clang" \
-	-DCMAKE_C_FLAGS="-arch x86_64 -arch arm64" \
-	-DCMAKE_CXX_COMPILER="clang++" \
-	-DCMAKE_CXX_FLAGS="-arch x86_64 -arch arm64"
-cmake --build build/ -j$(nproc)
+xmake config --clean --plat=macosx --arch=x86_64 --cxflags="-target x86_64-apple-macos10.9" --ldflags="-target x86_64-apple-macos10.9" --policies=build.optimization.lto
+xmake clean
+xmake build
 
-source build/config/config.sh
-VERSION=$VERSION-mac
+source build/config.sh
+VERSION=$VERSION-mac-x86
 
 source package/common.sh
 
@@ -20,7 +15,6 @@ export _platform="unix"
 export _archive="tar.xz"
 export _url_extension="url"
 export _script_extension="command"
-export _binary_suffix=""
 
 _Dist="字体合并补全工具-压缩字库-$VERSION" \
 _dist="WarFontMerger-XS-$VERSION" \

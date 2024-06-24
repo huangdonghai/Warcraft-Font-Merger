@@ -2,18 +2,11 @@
 
 set -e
 
-export PATH="/opt/aarch64-w64-mingw32/bin:$PATH"
+xmake config --clean --plat=mingw --arch=aarch64 --policies=build.optimization.lto
+xmake clean
+xmake build
 
-cmake . -B build/ \
-	-DCMAKE_BUILD_TYPE="Release" \
-	-DCMAKE_INTERPROCEDURAL_OPTIMIZATION:BOOL="ON" \
-	-DCMAKE_C_COMPILER="aarch64-w64-mingw32-clang" \
-	-DCMAKE_C_FLAGS="-static -s" \
-	-DCMAKE_CXX_COMPILER="aarch64-w64-mingw32-clang++" \
-	-DCMAKE_CXX_FLAGS="-static -s"
-cmake --build build/ -j$(nproc)
-
-source build/config/config.sh
+source build/config.sh
 VERSION=$VERSION-windows-arm64
 
 source package/common.sh
@@ -21,7 +14,6 @@ source package/common.sh
 export _platform="windows"
 export _archive="7z"
 export _url_extension="url"
-export _binary_suffix=".exe"
 
 _Dist="字体合并补全工具-压缩字库-$VERSION" \
 _dist="WarFontMerger-XS-$VERSION" \

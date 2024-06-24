@@ -1,0 +1,6 @@
+target("otfcc")
+	set_kind("static")
+	add_deps("otfcc-extern")
+	add_files("src/**.c")
+	add_includedirs("include", {public = true})
+	add_includedirs("src")

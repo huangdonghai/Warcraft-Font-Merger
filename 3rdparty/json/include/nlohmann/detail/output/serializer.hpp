@@ -35,8 +35,7 @@ enum class error_handler_t
 {
     strict,  ///< throw a type_error exception in case of invalid UTF-8
     replace, ///< replace invalid UTF-8 sequences with U+FFFD
-    ignore,  ///< ignore invalid UTF-8 sequences
-    as_is,   ///< leave invalid UTF-8 sequences "as is" - MODIFIED FOR WFM
+    ignore   ///< ignore invalid UTF-8 sequences
 };
 
 template<typename BasicJsonType>
@@ -56,7 +55,7 @@ class serializer
     @param[in] error_handler_  how to react on decoding errors
     */
     serializer(output_adapter_t<char> s, const char ichar,
-               error_handler_t error_handler_ = error_handler_t::as_is) // - MODIFIED FOR WFM
+               error_handler_t error_handler_ = error_handler_t::strict)
         : o(std::move(s))
         , loc(std::localeconv())
         , thousands_sep(loc->thousands_sep == nullptr ? '\0' : * (loc->thousands_sep))
@@ -425,14 +424,6 @@ class serializer
                             JSON_THROW(type_error::create(316, "invalid UTF-8 byte at index " + std::to_string(i) + ": 0x" + sn));
                         }
 
-                        case error_handler_t::as_is: // - MODIFIED FOR WFM
-                        {
-                            string_buffer[bytes++] = s[i];
-                            undumped_chars = 0;
-                            state = UTF8_ACCEPT;
-                            break;
-                        }
-
                         case error_handler_t::ignore:
                         case error_handler_t::replace:
                         {
@@ -546,16 +537,6 @@ class serializer
                     else
                     {
                         o->write_characters("\xEF\xBF\xBD", 3);
-                    }
-                    break;
-                }
-
-                // MODIFIED FOR WFM
-                case error_handler_t::as_is:
-                {
-                    if (bytes > 0)
-                    {
-                        o->write_characters(string_buffer.data(), bytes);
                     }
                     break;
                 }

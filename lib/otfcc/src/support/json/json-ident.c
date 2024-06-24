@@ -1,4 +1,6 @@
 #include "json-ident.h"
+
+#include <string.h>
 #include "support/otfcc-alloc.h"
 
 #ifdef _MSC_VER

@@ -2,19 +2,19 @@
 
 set -e
 
-xmake config --clean --plat=linux --arch=x86_64 --policies=build.optimization.lto
+xmake config --clean --plat=macosx --arch=arm64 --cxflags="-target arm64-apple-macos11" --ldflags="-target arm64-apple-macos11" --policies=build.optimization.lto
 xmake clean
 xmake build
 
 source build/config.sh
-VERSION=$VERSION-linux-amd64
+VERSION=$VERSION-mac-arm
 
 source package/common.sh
 
 export _platform="unix"
 export _archive="tar.xz"
-export _url_extension="desktop"
-export _script_extension="sh"
+export _url_extension="url"
+export _script_extension="command"
 
 _Dist="字体合并补全工具-压缩字库-$VERSION" \
 _dist="WarFontMerger-XS-$VERSION" \

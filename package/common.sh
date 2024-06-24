@@ -1,10 +1,14 @@
 # to be `source`-ed
 # do not call this script directly
 
+_merge_otd="$(xmake show --target=merge-otd | sed $'s/\x1b\[[0-9;]*m//g' | grep -E '^\s*targetfile:' | sed 's/^[^:]*:[[:space:]]*//')"
+_otfccbuild="$(xmake show --target=otfccbuild | sed $'s/\x1b\[[0-9;]*m//g' | grep -E '^\s*targetfile:' | sed 's/^[^:]*:[[:space:]]*//')"
+_otfccdump="$(xmake show --target=otfccdump | sed $'s/\x1b\[[0-9;]*m//g' | grep -E '^\s*targetfile:' | sed 's/^[^:]*:[[:space:]]*//')"
+
 function package_sc() {
 	mkdir -p release/$_Dist
 	cp script/homepage.url release/$_Dist/主页-使用说明.$_url_extension
-	cp build/{otfccbuild,otfccdump,merge-otd}$_binary_suffix release/$_Dist/
+	cp "$_merge_otd" "$_otfccbuild" "$_otfccdump" release/$_Dist/
 	cp font/$_cjk.ttf release/$_Dist/cjk.ttf
 	cp font/$_latin.ttf release/$_Dist/latin.ttf
 
@@ -42,7 +46,7 @@ function package_sc() {
 function package_tc() {
 	mkdir -p release/$_Dist
 	cp script/homepage.url release/$_Dist/主頁-使用說明\(簡體\).$_url_extension
-	cp build/{otfccbuild,otfccdump,merge-otd}$_binary_suffix release/$_Dist/
+	cp "$_merge_otd" "$_otfccbuild" "$_otfccdump" release/$_Dist/
 	cp font/$_cjk.ttf release/$_Dist/cjk.ttf
 	cp font/$_latin.ttf release/$_Dist/latin.ttf
 

@@ -2,6 +2,7 @@
 __pycache__
 /.vscode
 /.cache
+/.xmake
 /font-builder/src/*.otd
 /font-builder/out
 /build

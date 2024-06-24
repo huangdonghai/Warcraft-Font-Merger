@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include <clipp/clipp.h>
+#include <clipp.h>
 #include <nlohmann/json.hpp>
 #include <nowide/args.hpp>
 #include <nowide/cstdio.hpp>
@@ -25,7 +25,7 @@ using json = nlohmann::json;
 
 #if __cpp_char8_t >= 201811L
 
-inline auto &operator<<(decltype(nowide::cerr) &os, const char8_t *u8str) {
+inline auto &operator<<(std::ostream &os, const char8_t *u8str) {
 	return os << reinterpret_cast<const char *>(u8str);
 }
 
