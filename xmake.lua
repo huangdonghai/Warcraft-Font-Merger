@@ -49,6 +49,7 @@ target("config")
 	add_configfiles("config/config.sh.in", {variables = variables})
 
 includes("3rdparty/clipp")
+includes("3rdparty/fmt")
 includes("3rdparty/json")
 includes("3rdparty/json-builder")
 includes("3rdparty/json-parser")
