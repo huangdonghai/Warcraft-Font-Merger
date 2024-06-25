@@ -1,3 +1,8 @@
+#include <getopt.h>
+
+#include <nowide/args.hpp>
+#include <nowide/cstdio.hpp>
+
 #include "json-builder.h"
 #include "otfcc/sfnt.h"
 #include "otfcc/font.h"
@@ -34,26 +39,15 @@ void printHelp() {
 	        " --hex-cmap              : Export 'cmap' keys as hex number (U+FFFF).\n"
 	        " --name-by-hash          : Name glyphs using its hash value.\n"
 	        " --name-by-gid           : Name glyphs using its glyph id.\n"
-	        " --add-bom               : Add BOM mark in the output. (It is default on Windows\n"
-	        "                           when redirecting to another program. Use --no-bom to\n"
-	        "                           turn it off.)\n"
 	        "\n");
 }
-#ifdef _WIN32
-int main() {
-	int argc;
-	char **argv;
-	get_argv_utf8(&argc, &argv);
-#else
 int main(int argc, char *argv[]) {
-#endif
+	nowide::args _(argc, argv);
 
 	bool show_help = false;
 	bool show_version = false;
 	bool show_pretty = false;
 	bool show_ugly = false;
-	bool add_bom = false;
-	bool no_bom = false;
 	uint32_t ttcindex = 0;
 	struct option longopts[] = {{"version", no_argument, NULL, 'v'},
 	                            {"help", no_argument, NULL, 'h'},
@@ -70,8 +64,6 @@ int main(int argc, char *argv[]) {
 	                            {"glyph-name-prefix", required_argument, NULL, 0},
 	                            {"verbose", no_argument, NULL, 0},
 	                            {"quiet", no_argument, NULL, 0},
-	                            {"add-bom", no_argument, NULL, 0},
-	                            {"no-bom", no_argument, NULL, 0},
 	                            {"output", required_argument, NULL, 'o'},
 	                            {"ttc-index", required_argument, NULL, 'n'},
 	                            {"debug-wait-on-start", no_argument, NULL, 0},
@@ -97,10 +89,6 @@ int main(int argc, char *argv[]) {
 				} else if (strcmp(longopts[option_index].name, "ugly") == 0) {
 					show_ugly = true;
 				} else if (strcmp(longopts[option_index].name, "time") == 0) {
-				} else if (strcmp(longopts[option_index].name, "add-bom") == 0) {
-					add_bom = true;
-				} else if (strcmp(longopts[option_index].name, "no-bom") == 0) {
-					no_bom = true;
 				} else if (strcmp(longopts[option_index].name, "ignore-glyph-order") == 0) {
 					options->ignore_glyph_order = true;
 				} else if (strcmp(longopts[option_index].name, "verbose") == 0) {
@@ -179,7 +167,7 @@ int main(int argc, char *argv[]) {
 	otfcc_SplineFontContainer *sfnt;
 	loggedStep("Read SFNT") {
 		logProgress("From file %s", inPath);
-		FILE *file = u8fopen(inPath, "rb");
+		FILE *file = nowide::fopen(inPath, "rb");
 		sfnt = otfcc_readSFNT(file);
 		if (!sfnt || sfnt->count == 0) {
 			logError("Cannot read SFNT file \"%s\". Exit.\n", inPath);
@@ -228,7 +216,7 @@ int main(int argc, char *argv[]) {
 		jsonOptions.mode = json_serialize_mode_packed;
 		jsonOptions.opts = 0;
 		jsonOptions.indent_size = 4;
-		if (show_pretty || (!outputPath && isatty(fileno(stdout)))) {
+		if (show_pretty || (!outputPath && is_stdout_tty)) {
 			jsonOptions.mode = json_serialize_mode_multiline;
 		}
 		if (show_ugly) jsonOptions.mode = json_serialize_mode_packed;
@@ -240,15 +228,10 @@ int main(int argc, char *argv[]) {
 
 	loggedStep("Output") {
 		if (outputPath) {
-			FILE *outputFile = u8fopen(outputPath, "wb");
+			FILE *outputFile = nowide::fopen(outputPath, "wb");
 			if (!outputFile) {
 				logError("Cannot write to file \"%s\". Exit.", outputPath);
 				exit(EXIT_FAILURE);
-			}
-			if (add_bom) {
-				fputc(0xEF, outputFile);
-				fputc(0xBB, outputFile);
-				fputc(0xBF, outputFile);
 			}
 			size_t actualLen = buflen - 1;
 			while (!buf[actualLen])
@@ -256,37 +239,7 @@ int main(int argc, char *argv[]) {
 			fwrite(buf, sizeof(char), actualLen + 1, outputFile);
 			fclose(outputFile);
 		} else {
-#ifdef WIN32
-			if (isatty(fileno(stdout))) {
-				LPWSTR pwStr;
-				DWORD dwNum = widen_utf8(buf, &pwStr);
-				DWORD actual = 0;
-				DWORD written = 0;
-				const DWORD chunk = 0x10000;
-				while (written < dwNum) {
-					DWORD len = dwNum - written;
-					if (len > chunk) len = chunk;
-					WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), pwStr + written, len, &actual,
-					              NULL);
-					written += len;
-				}
-				free(pwStr);
-			} else {
-				if (!no_bom) {
-					fputc(0xEF, stdout);
-					fputc(0xBB, stdout);
-					fputc(0xBF, stdout);
-				}
-				fputs(buf, stdout);
-			}
-#else
-			if (add_bom) {
-				fputc(0xEF, stdout);
-				fputc(0xBB, stdout);
-				fputc(0xBF, stdout);
-			}
 			fputs(buf, stdout);
-#endif
 		}
 		logStepTime;
 	}

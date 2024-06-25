@@ -1,9 +1,13 @@
+#include <getopt.h>
+
+#include <nowide/args.hpp>
+#include <nowide/cstdio.hpp>
+
 #include "otfcc/sfnt.h"
 #include "otfcc/font.h"
 #include "otfcc/sfnt-builder.h"
 
 #include "aliases.h"
-#include "platform.h"
 #include "stopwatch.h"
 
 // - MODIFIED FOR WFM
@@ -65,7 +69,7 @@ void printHelp() {
 void readEntireFile(char *inPath, char **_buffer, long *_length) {
 	char *buffer = NULL;
 	long length = 0;
-	FILE *f = u8fopen(inPath, "rb");
+	FILE *f = nowide::fopen(inPath, "rb");
 	if (!f) {
 		fprintf(stderr, "Cannot read JSON file \"%s\". Exit.\n", inPath);
 		exit(EXIT_FAILURE);
@@ -109,14 +113,8 @@ void readEntireStdin(char **_buffer, long *_length) {
 	*_length = length;
 }
 
-#ifdef _WIN32
-int main() {
-	int argc;
-	char **argv;
-	get_argv_utf8(&argc, &argv);
-#else
 int main(int argc, char *argv[]) {
-#endif
+	nowide::args _(argc, argv);
 
 	struct timespec begin;
 	time_now(&begin);
@@ -303,7 +301,7 @@ int main(int argc, char *argv[]) {
 		otfcc_IFontSerializer *writer = otfcc_newOTFWriter();
 		caryll_Buffer *otf = (caryll_Buffer *)writer->serialize(font, options);
 		loggedStep("Write to file") {
-			FILE *outfile = u8fopen(outputPath, "wb");
+			FILE *outfile = nowide::fopen(outputPath, "wb");
 			if (!outfile) {
 				logError("Cannot write to file \"%s\". Exit.\n", outputPath);
 				exit(EXIT_FAILURE);

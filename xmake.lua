@@ -25,6 +25,7 @@ target("merge-otd")
 target("otfccbuild")
 	set_kind("binary")
 	add_rules("static_binary")
+	add_deps("nowide")
 	add_deps("config", "otfcc")
 	add_files(
 		"src/otfcc-driver/otfccbuild.c",
@@ -34,6 +35,7 @@ target("otfccbuild")
 target("otfccdump")
 	set_kind("binary")
 	add_rules("static_binary")
+	add_deps("nowide")
 	add_deps("config", "otfcc")
 	add_files(
 		"src/otfcc-driver/otfccdump.c",
