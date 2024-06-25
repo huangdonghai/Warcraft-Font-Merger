@@ -8,3 +8,6 @@ __pycache__
 /build
 /release
 /compile_commands.json
+/po/*.mo
+/po/*.po~
+/po/*.pot

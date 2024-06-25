@@ -11,6 +11,7 @@ function package_sc() {
 	cp "$_merge_otd" "$_otfccbuild" "$_otfccdump" release/$_Dist/
 	cp font/$_cjk.ttf release/$_Dist/cjk.ttf
 	cp font/$_latin.ttf release/$_Dist/latin.ttf
+	cp po/zh_CN.mo release/$_Dist/zh_CN.mo
 
 	case $_platform in
 		unix)
@@ -49,6 +50,7 @@ function package_tc() {
 	cp "$_merge_otd" "$_otfccbuild" "$_otfccdump" release/$_Dist/
 	cp font/$_cjk.ttf release/$_Dist/cjk.ttf
 	cp font/$_latin.ttf release/$_Dist/latin.ttf
+	cp po/zh_CN.mo release/$_Dist/zh_CN.mo
 
 	case $_platform in
 		unix)

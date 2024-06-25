@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <memory>
 #include <streambuf>
 #include <string>
 #include <vector>
@@ -15,7 +16,9 @@
 #include <nowide/cstdio.hpp>
 #include <nowide/fstream.hpp>
 #include <nowide/iostream.hpp>
+#include <spdlog/spdlog.h>
 
+#include "intl.hpp"
 #include "invisible.hpp"
 #include "merge-name.h"
 #include "ps2tt.h"
@@ -23,18 +26,10 @@
 
 using json = nlohmann::json;
 
-#if __cpp_char8_t >= 201811L
-
-inline auto &operator<<(std::ostream &os, const char8_t *u8str) {
-	return os << reinterpret_cast<const char *>(u8str);
-}
-
-#endif
-
 std::string LoadFile(const std::string &u8filename) {
 	nowide::ifstream file(u8filename);
 	if (!file) {
-		nowide::cerr << u8"读取文件 " << u8filename << u8" 失败\n" << std::endl;
+		spdlog::error(fmt::runtime(_("Failed to load file {0}")), u8filename);
 		throw std::runtime_error("failed to load file");
 	}
 	std::string result{std::istreambuf_iterator<char>(file),
@@ -176,7 +171,7 @@ json MergeCodePage(std::vector<json> cpranges) {
 }
 
 int main(int argc, char *u8argv[]) {
-	nowide::args _{argc, u8argv};
+	nowide::args args{argc, u8argv};
 
 	std::string outputPath;
 
@@ -184,51 +179,59 @@ int main(int argc, char *u8argv[]) {
 
 	std::string baseFileName;
 	std::vector<std::string> appendFileNames;
-
 	auto cli = ({
 		using namespace clipp;
 		((option("-o", "--output") & value("out.otd", outputPath)) %
-		     "输出 otd 文件路径。如果不指定，则覆盖第一个输入 otd 文件。",
+		     _("Output otd file. If omit, override the first input otd "
+		       "file."),
 		 (option("-n", "--name") &
 		  value("Font Name;Weight;Width;Slope", overrideNameStyle)) %
-		     R"+(指定字体家族名和样式。如果不指定，则自动根据原字体名合成新的字体名。
-格式："字体名;字重;宽度;倾斜"
-字重的取值范围
-　数字：100 至 950 之间的整数（含两端点）。
-　下列单词（不区分大小写，忽略连字符；括号内的单词视作左边单词的同义词）：
-　　Thin       = 100（UltraLight）
-　　ExtraLight = 200
-　　Light      = 300
-　　SemiLight  = 350（DemiLight）
-　　Normal     = 372
-　　Regular    = 400（Roman、""）
-　　Book       = 450
-　　Medium     = 500
-　　SemiBold   = 600（Demi、DemiBold）
-　　Bold       = 700
-　　ExtraBold  = 800
-　　Black      = 900（Heavy、UltraBold）
-　　ExtraBlack = 950
-宽度的取值范围
-　数字：1 至 9 之间的整数（含两端点）。
-　下列单词（不区分大小写，忽略连字符；括号内的单词视作左边单词的同义词）：
-　　UltraCondensed = 1
-　　ExtraCondensed = 2
-　　Condensed      = 3
-　　SemiCondensed  = 4
-　　Normal         = 5（""）
-　　SemiExtended   = 6（SemiExpanded）
-　　Extended       = 7（Expanded）
-　　ExtraExtended  = 8（ExtraExpanded）
-　　UltraExtended  = 9（UltraExpanded）
-倾斜的取值范围
-　下列单词（不区分大小写；括号内的单词视作左边单词的同义词）：
-　　Upright（Normal、Roman、Unslanted、""）
-　　Italic （Italized）
-　　Oblique（Slant）)+",
+		     _("Set font family and style, formatted as \"Font "
+		       "Name;Weight;Width;Slope\".\n"
+		       "If unset, the font family and style will be automatically "
+		       "derived from the original font name.\n"
+		       "\n"
+		       "Values for weight:\n"
+		       "+ Number: 100 to 950, inclusive.\n"
+		       "+ The following keywords (case insensitive, ignore hyphens; "
+		       "synonyms are listed in parentheses):\n"
+		       "+ - Thin       = 100 (UltraLight)\n"
+		       "+ - ExtraLight = 200\n"
+		       "+ - Light      = 300\n"
+		       "+ - SemiLight  = 350 (DemiLight)\n"
+		       "+ - Normal     = 372\n"
+		       "+ - Regular    = 400 (Roman, \"\")\n"
+		       "+ - Book       = 450\n"
+		       "+ - Medium     = 500\n"
+		       "+ - SemiBold   = 600 (Demi, DemiBold)\n"
+		       "+ - Bold       = 700\n"
+		       "+ - ExtraBold  = 800\n"
+		       "+ - Black      = 900 (Heavy, UltraBold)\n"
+		       "+ - ExtraBlack = 950\n"
+		       "\n"
+		       "Values for width:\n"
+		       "+ Number: 1 to 9, inclusive.\n"
+		       "+ The following keywords (case insensitive, ignore hyphens; "
+		       "synonyms are listed in parentheses):\n"
+		       "+ - UltraCondensed = 1\n"
+		       "+ - ExtraCondensed = 2\n"
+		       "+ - Condensed      = 3\n"
+		       "+ - SemiCondensed  = 4\n"
+		       "+ - Normal         = 5 (\"\")\n"
+		       "+ - SemiExtended   = 6 (SemiExpanded)\n"
+		       "+ - Extended       = 7 (Expanded)\n"
+		       "+ - ExtraExtended  = 8 (ExtraExpanded)\n"
+		       "+ - UltraExtended  = 9 (UltraExpanded)\n"
+		       "\n"
+		       "Values for slope (case insensitive; synonyms are listed in "
+		       "parentheses):\n"
+		       "- Upright (Normal, Roman, Unslanted, \"\")\n"
+		       "- Italic (Italized)\n"
+		       "- Oblique (Slant)\n"),
 		 value("base.otd", baseFileName),
 		 values("append.otd", appendFileNames));
 	});
+
 	if (!clipp::parse(argc, u8argv, cli) || appendFileNames.empty()) {
 		nowide::cout << clipp::make_man_page(cli, "merge-otd") << std::endl;
 		return EXIT_FAILURE;

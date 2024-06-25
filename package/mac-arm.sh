@@ -9,6 +9,7 @@ xmake build
 source build/config.sh
 VERSION=$VERSION-mac-arm
 
+po/update.sh
 source package/common.sh
 
 export _platform="unix"

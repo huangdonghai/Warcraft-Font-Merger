@@ -9,6 +9,7 @@ xmake build
 source build/config.sh
 VERSION=$VERSION-linux-amd64
 
+po/update.sh
 source package/common.sh
 
 export _platform="unix"
