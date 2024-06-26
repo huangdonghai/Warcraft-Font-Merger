@@ -21,7 +21,11 @@ target("merge-otd")
 	add_rules("static_binary")
 	add_deps("clipp", "fmt", "json", "nowide", "spdlog")
 	add_deps("intl")
-	add_files("src/merger/*.cpp")
+	add_files(
+		"src/merge-name.cpp",
+		"src/merge-otd.cpp",
+		"src/ps2tt.cpp",
+		"src/tt2ps.cpp")
 
 target("otfccbuild")
 	set_kind("binary")
@@ -29,8 +33,8 @@ target("otfccbuild")
 	add_deps("nowide")
 	add_deps("config", "otfcc")
 	add_files(
-		"src/otfcc-driver/otfccbuild.c",
-		"src/otfcc-driver/stopwatch.c",
+		"src/otfccbuild.c",
+		"src/stopwatch.c",
 		{sourcekind = "cxx"})
 
 target("otfccdump")
@@ -39,8 +43,8 @@ target("otfccdump")
 	add_deps("nowide")
 	add_deps("config", "otfcc")
 	add_files(
-		"src/otfcc-driver/otfccdump.c",
-		"src/otfcc-driver/stopwatch.c",
+		"src/otfccdump.c",
+		"src/stopwatch.c",
 		{sourcekind = "cxx"})
 
 target("config")

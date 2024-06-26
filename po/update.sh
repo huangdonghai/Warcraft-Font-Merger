@@ -3,9 +3,9 @@
 set -e
 
 xgettext --c++ --from-code=UTF-8 --keyword=_ --no-location --omit-header --output=po/unified.pot \
-	src/merger/merge-otd.cpp \
-	src/otfcc-driver/otfccbuild.c \
-	src/otfcc-driver/otfccdump.c
+	src/merge-otd.cpp \
+	src/otfccbuild.c \
+	src/otfccdump.c
 
 for lang in zh_CN
 do

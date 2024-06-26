@@ -8,8 +8,17 @@
 #include "otfcc/font.h"
 
 #include "aliases.h"
-#include "platform.h"
 #include "stopwatch.h"
+
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+inline const bool is_stdout_tty = GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)) == FILE_TYPE_CHAR;
+#else
+#include <unistd.h>
+inline const bool is_stdout_tty = isatty(STDOUT_FILENO);
+#endif
 
 // - MODIFIED FOR WFM
 #include <config.h>
