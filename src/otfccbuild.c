@@ -1,3 +1,4 @@
+#include <chrono>
 #include <getopt.h>
 
 #include <nowide/args.hpp>
@@ -116,8 +117,9 @@ void readEntireStdin(char **_buffer, long *_length) {
 int main(int argc, char *argv[]) {
 	nowide::args _(argc, argv);
 
-	struct timespec begin;
-	time_now(&begin);
+	
+
+	auto begin = std::chrono::system_clock::now();
 
 	bool show_help = false;
 	bool show_version = false;

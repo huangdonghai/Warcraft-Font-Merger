@@ -1,3 +1,4 @@
+#include <chrono>
 #include <getopt.h>
 
 #include <nowide/args.hpp>
@@ -169,9 +170,7 @@ int main(int argc, char *argv[]) {
 		inPath = sdsnew(argv[optind]);
 	}
 
-	struct timespec begin;
-
-	time_now(&begin);
+	auto begin = std::chrono::system_clock::now();
 
 	otfcc_SplineFontContainer *sfnt;
 	loggedStep("Read SFNT") {

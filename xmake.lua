@@ -31,20 +31,22 @@ target("otfccbuild")
 	set_kind("binary")
 	add_rules("static_binary")
 	add_deps("nowide")
-	add_deps("config", "otfcc")
+	add_deps("intl", "otfcc")
+	add_deps("config")
 	add_files(
 		"src/otfccbuild.c",
-		"src/stopwatch.c",
+		"src/stopwatch.cpp",
 		{sourcekind = "cxx"})
 
 target("otfccdump")
 	set_kind("binary")
 	add_rules("static_binary")
 	add_deps("nowide")
-	add_deps("config", "otfcc")
+	add_deps("intl", "otfcc")
+	add_deps("config")
 	add_files(
 		"src/otfccdump.c",
-		"src/stopwatch.c",
+		"src/stopwatch.cpp",
 		{sourcekind = "cxx"})
 
 target("config")

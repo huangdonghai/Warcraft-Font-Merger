@@ -5,7 +5,8 @@ set -e
 xgettext --c++ --from-code=UTF-8 --keyword=_ --no-location --omit-header --output=po/unified.pot \
 	src/merge-otd.cpp \
 	src/otfccbuild.c \
-	src/otfccdump.c
+	src/otfccdump.c \
+	src/stopwatch.cpp
 
 for lang in zh_CN
 do

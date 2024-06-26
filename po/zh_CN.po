@@ -94,3 +94,7 @@ msgstr ""
 "- Upright (Normal, Roman, Unslanted, \"\")\n"
 "- Italic (Italized)\n"
 "- Oblique (Slant)\n"
+
+#, c-format
+msgid "Step time = %g s.\n"
+msgstr "步骤耗时 %g 秒。\n"
