@@ -5,7 +5,7 @@
 static otl_Subtable *_caryll_read_otl_extend(font_file_pointer data, uint32_t tableLength,
                                              uint32_t subtableOffset, otl_LookupType BASIS,
                                              const glyphid_t maxGlyphs,
-                                             const otfcc_Options *options) {
+                                             const otfcc::options_t &options) {
 	otl_Subtable *_subtable;
 	NEW(_subtable);
 	checkLength(subtableOffset + 8);
@@ -24,13 +24,13 @@ OK:
 
 otl_Subtable *otfcc_readOtl_gsub_extend(font_file_pointer data, uint32_t tableLength,
                                         uint32_t subtableOffset, const glyphid_t maxGlyphs,
-                                        const otfcc_Options *options) {
+                                        const otfcc::options_t &options) {
 	return _caryll_read_otl_extend(data, tableLength, subtableOffset, otl_type_gsub_unknown,
 	                               maxGlyphs, options);
 }
 otl_Subtable *otfcc_readOtl_gpos_extend(font_file_pointer data, uint32_t tableLength,
                                         uint32_t subtableOffset, const glyphid_t maxGlyphs,
-                                        const otfcc_Options *options) {
+                                        const otfcc::options_t &options) {
 	return _caryll_read_otl_extend(data, tableLength, subtableOffset, otl_type_gpos_unknown,
 	                               maxGlyphs, options);
 }

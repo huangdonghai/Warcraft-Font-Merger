@@ -1,6 +1,6 @@
 #include "../chaining.h"
 
-otl_Subtable *otl_parse_chaining(const json_value *_subtable, const otfcc_Options *options) {
+otl_Subtable *otl_parse_chaining(const json_value *_subtable, const otfcc::options_t &options) {
 	json_value *_match = json_obj_get_type(_subtable, "match", json_array);
 	json_value *_apply = json_obj_get_type(_subtable, "apply", json_array);
 	if (!_match || !_apply) return NULL;

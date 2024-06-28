@@ -1,6 +1,8 @@
 #include "gpos-mark-to-ligature.h"
 #include "gpos-common.h"
 
+#include <intl.hpp>
+
 static void deleteLigArrayItem(otl_LigatureBaseRecord *entry) {
 	Handle.dispose(&entry->glyph);
 	if (entry->anchors) {
@@ -29,7 +31,7 @@ caryll_standardRefType(subtable_gpos_markToLigature, iSubtable_gpos_markToLigatu
 
 otl_Subtable *otl_read_gpos_markToLigature(const font_file_pointer data, uint32_t tableLength,
                                            uint32_t offset, const glyphid_t maxGlyphs,
-                                           const otfcc_Options *options) {
+                                           const otfcc::options_t &options) {
 	subtable_gpos_markToLigature *subtable = iSubtable_gpos_markToLigature.create();
 	otl_Coverage *marks = NULL;
 	otl_Coverage *bases = NULL;
@@ -127,7 +129,7 @@ json_value *otl_gpos_dump_markToLigature(const otl_Subtable *st) {
 }
 
 static void parseBases(json_value *_bases, subtable_gpos_markToLigature *subtable,
-                       otl_ClassnameHash **h, const otfcc_Options *options) {
+                       otl_ClassnameHash **h, const otfcc::options_t &options) {
 	glyphclass_t classCount = HASH_COUNT(*h);
 
 	for (glyphid_t j = 0; j < _bases->u.object.length; j++) {
@@ -160,8 +162,8 @@ static void parseBases(json_value *_bases, subtable_gpos_markToLigature *subtabl
 				otl_ClassnameHash *s;
 				HASH_FIND_STR(*h, className, s);
 				if (!s) {
-					logWarning("[OTFCC-fea] Invalid anchor class name <%s> for /%s. This base "
-					           "anchor is ignored.\n",
+					logWarning(_("[OTFCC-fea] Invalid anchor class name <{0}> for /{1}. This base "
+					             "anchor is ignored.\n"),
 					           className, gname);
 					goto NEXT;
 				}
@@ -176,7 +178,7 @@ static void parseBases(json_value *_bases, subtable_gpos_markToLigature *subtabl
 	}
 }
 otl_Subtable *otl_gpos_parse_markToLigature(const json_value *_subtable,
-                                            const otfcc_Options *options) {
+                                            const otfcc::options_t &options) {
 	json_value *_marks = json_obj_get_type(_subtable, "marks", json_object);
 	json_value *_bases = json_obj_get_type(_subtable, "bases", json_object);
 	if (!_marks || !_bases) return NULL;

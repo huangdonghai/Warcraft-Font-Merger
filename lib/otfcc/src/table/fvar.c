@@ -1,5 +1,7 @@
 #include "fvar.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 
 // fvar instance tuple
@@ -94,7 +96,7 @@ struct InstanceRecord {
 };
 #pragma pack()
 
-table_fvar *otfcc_readFvar(const otfcc_Packet packet, const otfcc_Options *options) {
+table_fvar *otfcc_readFvar(const otfcc_Packet packet, const otfcc::options_t &options) {
 	table_fvar *fvar = NULL;
 	FOR_TABLE('fvar', table) {
 		font_file_pointer data = table.data;
@@ -167,14 +169,14 @@ table_fvar *otfcc_readFvar(const otfcc_Packet packet, const otfcc_Options *optio
 		return fvar;
 
 	FAIL:
-		logWarning("table 'fvar' corrupted.\n");
+		logWarning(_("table 'fvar' corrupted."));
 		table_iFvar.free(fvar);
 		fvar = NULL;
 	}
 	return NULL;
 }
 
-void otfcc_dumpFvar(const table_fvar *table, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpFvar(const table_fvar *table, json_value *root, const otfcc::options_t &options) {
 	if (!table) return;
 	loggedStep("fvar") {
 		json_value *t = json_object_new(2);

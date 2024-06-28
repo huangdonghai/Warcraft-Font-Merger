@@ -1,5 +1,7 @@
 #include "private.h"
 
+#include <intl.hpp>
+
 #define LARGE_SUBTABLE_LIMIT 4096
 
 static uint32_t featureNameToTag(const sds name) {
@@ -103,7 +105,7 @@ static otl_BuildHeuristics getLookupHeuristics(const table_OTL *table, const otl
 // When writing lookups, otfcc will try to maintain everything correctly.
 // That is, we will use extended layout lookups automatically when the
 // offsets are too large.
-static bk_Block *writeOTLLookups(const table_OTL *table, const otfcc_Options *options,
+static bk_Block *writeOTLLookups(const table_OTL *table, const otfcc::options_t &options,
                                  const char *tag) {
 	caryll_Buffer ***subtables;
 	NEW(subtables, table->lookups.length);
@@ -116,7 +118,7 @@ static bk_Block *writeOTLLookups(const table_OTL *table, const otfcc_Options *op
 	for (tableid_t j = 0; j < table->lookups.length; j++) {
 		otl_Lookup *lookup = table->lookups.items[j];
 		otl_BuildHeuristics heu = getLookupHeuristics(table, lookup);
-		logProgress("Building lookup %s (%u/%u)\n", lookup->name, j,
+		logProgress(_("Building lookup {0} ({1}/{2})"), lookup->name, j,
 		            (uint32_t)table->lookups.length);
 		subtableQuantity[j] =
 		    _build_lookup(lookup, &(subtables[j]), &lastOffset, &(preferExtForThisLut[j]), heu);
@@ -132,13 +134,13 @@ static bk_Block *writeOTLLookups(const table_OTL *table, const otfcc_Options *op
 	                              bkover);
 	for (tableid_t j = 0; j < table->lookups.length; j++) {
 		if (!subtableQuantity[j]) {
-			logNotice("Lookup %s is empty.\n", table->lookups.items[j]->name);
+			logNotice(_("Lookup {} is empty."), table->lookups.items[j]->name);
 		}
 		otl_Lookup *lookup = table->lookups.items[j];
 		const bool canBeContextual = otfcc_chainingLookupIsContextualLookup(lookup);
 		const bool useExtendedForIt = useExtended || preferExtForThisLut[j];
 		if (useExtendedForIt) {
-			logNotice("[OTFCC-fea] Using extended OpenType table layout for %s/%s.\n", tag,
+			logNotice(_("[OTFCC-fea] Using extended OpenType table layout for {0}/{1}."), tag,
 			          lookup->name);
 		}
 		uint16_t lookupType =
@@ -189,7 +191,7 @@ static bk_Block *writeOTLLookups(const table_OTL *table, const otfcc_Options *op
 	return root;
 }
 
-static bk_Block *writeOTLFeatures(const table_OTL *table, const otfcc_Options *options) {
+static bk_Block *writeOTLFeatures(const table_OTL *table, const otfcc::options_t &options) {
 	bk_Block *root = bk_new_Block(b16, table->features.length, bkover);
 	for (tableid_t j = 0; j < table->features.length; j++) {
 		bk_Block *fea = bk_new_Block(p16, NULL,                                     // FeatureParams
@@ -253,7 +255,7 @@ static bk_Block *writeScript(script_stat_hash *script, const table_OTL *table) {
 	}
 	return root;
 }
-static bk_Block *writeOTLScriptAndLanguages(const table_OTL *table, const otfcc_Options *options) {
+static bk_Block *writeOTLScriptAndLanguages(const table_OTL *table, const otfcc::options_t &options) {
 	script_stat_hash *h = NULL;
 	for (tableid_t j = 0; j < table->languages.length; j++) {
 		otl_LanguageSystem *language = table->languages.items[j];
@@ -302,11 +304,11 @@ static bk_Block *writeOTLScriptAndLanguages(const table_OTL *table, const otfcc_
 	return root;
 }
 
-caryll_Buffer *otfcc_buildOtl(const table_OTL *table, const otfcc_Options *options,
+caryll_Buffer *otfcc_buildOtl(const table_OTL *table, const otfcc::options_t &options,
                               const char *tag) {
 	if (!table) return NULL;
 	caryll_Buffer *buf;
-	loggedStep("%s", tag) {
+	loggedStep(tag) {
 		bk_Block *lookups = writeOTLLookups(table, options, tag);
 		bk_Block *features = writeOTLFeatures(table, options);
 		bk_Block *languages = writeOTLScriptAndLanguages(table, options);

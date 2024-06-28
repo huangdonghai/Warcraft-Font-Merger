@@ -10,7 +10,7 @@ static INLINE void disposeFpgmPrep(MOVE table_fpgm_prep *table) {
 
 caryll_standardRefType(table_fpgm_prep, table_iFpgm_prep, disposeFpgmPrep);
 
-table_fpgm_prep *otfcc_readFpgmPrep(const otfcc_Packet packet, const otfcc_Options *options,
+table_fpgm_prep *otfcc_readFpgmPrep(const otfcc_Packet packet, const otfcc::options_t &options,
                                     uint32_t tag) {
 	table_fpgm_prep *t = NULL;
 	FOR_TABLE(tag, table) {
@@ -31,9 +31,9 @@ table_fpgm_prep *otfcc_readFpgmPrep(const otfcc_Packet packet, const otfcc_Optio
 }
 
 void table_dumpTableFpgmPrep(const table_fpgm_prep *table, json_value *root,
-                             const otfcc_Options *options, const char *tag) {
+                             const otfcc::options_t &options, const char *tag) {
 	if (!table) return;
-	loggedStep("%s", tag) {
+	loggedStep(tag) {
 		json_object_push(root, tag, dump_ttinstr(table->bytes, table->length, options));
 	}
 }
@@ -51,12 +51,12 @@ void wrongFpgmPrepInstr(void *_t, char *reason, int pos) {
 	*/
 }
 
-table_fpgm_prep *otfcc_parseFpgmPrep(const json_value *root, const otfcc_Options *options,
+table_fpgm_prep *otfcc_parseFpgmPrep(const json_value *root, const otfcc::options_t &options,
                                      const char *tag) {
 	table_fpgm_prep *t = NULL;
 	json_value *table = NULL;
 	if ((table = json_obj_get(root, tag))) {
-		loggedStep("%s", tag) {
+		loggedStep(tag) {
 			t = table_iFpgm_prep.create();
 			t->tag = sdsnew(tag);
 			parse_ttinstr(table, t, makeFpgmPrepInstr, wrongFpgmPrepInstr);
@@ -65,7 +65,7 @@ table_fpgm_prep *otfcc_parseFpgmPrep(const json_value *root, const otfcc_Options
 	return t;
 }
 
-caryll_Buffer *otfcc_buildFpgmPrep(const table_fpgm_prep *table, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildFpgmPrep(const table_fpgm_prep *table, const otfcc::options_t &options) {
 	if (!table) return NULL;
 	caryll_Buffer *buf = bufnew();
 	bufwrite_bytes(buf, table->length, table->bytes);

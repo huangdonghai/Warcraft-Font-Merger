@@ -1,6 +1,8 @@
 #include "support/util.h"
 #include "otfcc/sfnt-builder.h"
 
+#include <intl.hpp>
+
 static uint32_t buf_checksum(caryll_Buffer *buffer) {
 	uint32_t actualLength = (uint32_t)buflen(buffer);
 	buflongalign(buffer);
@@ -35,13 +37,13 @@ static otfcc_SFNTTableEntry *createSegment(uint32_t tag, caryll_Buffer *buffer) 
 	return table;
 }
 
-otfcc_SFNTBuilder *otfcc_newSFNTBuilder(uint32_t header, const otfcc_Options *options) {
+otfcc_SFNTBuilder *otfcc_newSFNTBuilder(uint32_t header, const otfcc::options_t &options) {
 	otfcc_SFNTBuilder *builder;
 	NEW(builder);
 	builder->count = 0;
 	builder->header = header;
 	builder->tables = NULL;
-	builder->options = options;
+	builder->options = &options;
 	return builder;
 }
 
@@ -59,12 +61,12 @@ void otfcc_deleteSFNTBuilder(otfcc_SFNTBuilder *builder) {
 void otfcc_SFNTBuilder_pushTable(otfcc_SFNTBuilder *builder, uint32_t tag, caryll_Buffer *buffer) {
 	if (!builder || !buffer) return;
 	otfcc_SFNTTableEntry *item;
-	const otfcc_Options *options = builder->options;
+	const otfcc::options_t &options = *builder->options;
 	HASH_FIND_INT(builder->tables, &tag, item);
 	if (!item) {
 		item = createSegment(tag, buffer);
 		HASH_ADD_INT(builder->tables, tag, item);
-		logProgress("OpenType table %c%c%c%c successfully built.\n", (tag >> 24) & 0xff,
+		logProgress(_("OpenType table {}{}{}{} successfully built."), (tag >> 24) & 0xff,
 		            (tag >> 16) & 0xff, (tag >> 8) & 0xff, tag & 0xff);
 	} else {
 		buffree(buffer);

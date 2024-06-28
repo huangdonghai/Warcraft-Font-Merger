@@ -1,5 +1,7 @@
 #include "gasp.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 
 #define GASP_DOGRAY 0x0002
@@ -20,7 +22,7 @@ static INLINE void disposeGasp(MOVE table_gasp *gasp) {
 
 caryll_standardRefType(table_gasp, table_iGasp, initGasp, disposeGasp);
 
-table_gasp *otfcc_readGasp(const otfcc_Packet packet, const otfcc_Options *options) {
+table_gasp *otfcc_readGasp(const otfcc_Packet packet, const otfcc::options_t &options) {
 	table_gasp *gasp = NULL;
 	FOR_TABLE('gasp', table) {
 		font_file_pointer data = table.data;
@@ -45,13 +47,13 @@ table_gasp *otfcc_readGasp(const otfcc_Packet packet, const otfcc_Options *optio
 		return gasp;
 
 	FAIL:
-		logWarning("table 'gasp' corrupted.\n");
+		logWarning(_("table 'gasp' corrupted."));
 		table_iGasp.free(gasp);
 		gasp = NULL;
 	}
 	return NULL;
 }
-void otfcc_dumpGasp(const table_gasp *table, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpGasp(const table_gasp *table, json_value *root, const otfcc::options_t &options) {
 	if (!table) return;
 	loggedStep("gasp") {
 		json_value *t = json_array_new(table->records.length);
@@ -71,7 +73,7 @@ void otfcc_dumpGasp(const table_gasp *table, json_value *root, const otfcc_Optio
 	}
 }
 
-table_gasp *otfcc_parseGasp(const json_value *root, const otfcc_Options *options) {
+table_gasp *otfcc_parseGasp(const json_value *root, const otfcc::options_t &options) {
 	table_gasp *gasp = NULL;
 	json_value *table = NULL;
 	if ((table = json_obj_get_type(root, "gasp", json_array))) {
@@ -93,7 +95,7 @@ table_gasp *otfcc_parseGasp(const json_value *root, const otfcc_Options *options
 	return gasp;
 }
 
-caryll_Buffer *otfcc_buildGasp(const table_gasp *gasp, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildGasp(const table_gasp *gasp, const otfcc::options_t &options) {
 	if (!gasp) return NULL;
 	caryll_Buffer *buf = bufnew();
 	bufwrite16b(buf, 1);

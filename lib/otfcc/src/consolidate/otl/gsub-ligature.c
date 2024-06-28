@@ -1,20 +1,21 @@
 #include "gsub-ligature.h"
 
+#include <intl.hpp>
+
 bool consolidate_gsub_ligature(otfcc_Font *font, table_OTL *table, otl_Subtable *_subtable,
-                               const otfcc_Options *options) {
+                               const otfcc::options_t &options) {
 	subtable_gsub_ligature *subtable = &(_subtable->gsub_ligature);
 	subtable_gsub_ligature nt;
 	iSubtable_gsub_ligature.init(&nt);
 	for (glyphid_t k = 0; k < subtable->length; k++) {
 		if (!GlyphOrder.consolidateHandle(font->glyph_order, &subtable->items[k].to)) {
-			logWarning("[Consolidate] Ignored missing glyph /%s.\n", subtable->items[k].to.name);
+			logWarning(_("[Consolidate] Ignored missing glyph /{}."), subtable->items[k].to.name);
 			continue;
 		}
 		fontop_consolidateCoverage(font, subtable->items[k].from, options);
 		Coverage.shrink(subtable->items[k].from, false);
 		if (!subtable->items[k].from->numGlyphs) {
-			logWarning("[Consolidate] Ignoring empty ligature substitution to "
-			           "glyph /%s.\n",
+			logWarning(_("[Consolidate] Ignoring empty ligature substitution to glyph /{}."),
 			           subtable->items[k].to.name);
 			continue;
 		}

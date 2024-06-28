@@ -1,7 +1,7 @@
 #include "TSI5.h"
 #include "support/util.h"
 
-table_TSI5 *otfcc_readTSI5(const otfcc_Packet packet, const otfcc_Options *options) {
+table_TSI5 *otfcc_readTSI5(const otfcc_Packet packet, const otfcc::options_t &options) {
 	FOR_TABLE('TSI5', table) {
 		table_TSI5 *tsi5 = otl_iClassDef.create();
 		for (glyphid_t j = 0; j * 2 < table.length; j++) {
@@ -11,16 +11,16 @@ table_TSI5 *otfcc_readTSI5(const otfcc_Packet packet, const otfcc_Options *optio
 	}
 	return NULL;
 }
-void otfcc_dumpTSI5(const table_TSI5 *table, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpTSI5(const table_TSI5 *table, json_value *root, const otfcc::options_t &options) {
 	if (!table) return;
 	json_object_push(root, "TSI5", otl_iClassDef.dump(table));
 }
-table_TSI5 *otfcc_parseTSI5(const json_value *root, const otfcc_Options *options) {
+table_TSI5 *otfcc_parseTSI5(const json_value *root, const otfcc::options_t &options) {
 	json_value *_tsi = NULL;
 	if (!(_tsi = json_obj_get_type(root, "TSI5", json_object))) return NULL;
 	return otl_iClassDef.parse(_tsi);
 }
-caryll_Buffer *otfcc_buildTSI5(const table_TSI5 *tsi5, const otfcc_Options *options,
+caryll_Buffer *otfcc_buildTSI5(const table_TSI5 *tsi5, const otfcc::options_t &options,
                                glyphid_t numGlyphs) {
 	if (!tsi5) return NULL;
 	uint16_t *tsi5cls;

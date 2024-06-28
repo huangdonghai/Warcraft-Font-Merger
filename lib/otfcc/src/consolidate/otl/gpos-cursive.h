@@ -3,6 +3,6 @@
 #include "common.h"
 
 bool consolidate_gpos_cursive(otfcc_Font *font, table_OTL *table, otl_Subtable *_subtable,
-                              const otfcc_Options *options);
+                              const otfcc::options_t &options);
 
 #endif

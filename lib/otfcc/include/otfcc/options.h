@@ -1,41 +1,44 @@
-#ifndef CARYLL_INCLUDE_OPTIONS_H
-#define CARYLL_INCLUDE_OPTIONS_H
+#pragma once
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include "logger.h"
 
-typedef struct {
-	bool debug_wait_on_start;
-	bool ignore_glyph_order;
-	bool ignore_hints;
-	bool has_vertical_metrics;
-	bool export_fdselect;
-	bool keep_average_char_width;
-	bool keep_unicode_ranges;
-	bool short_post;
-	bool dummy_DSIG;
-	bool keep_modified_time;
-	bool instr_as_bytes;
-	bool verbose;
-	bool quiet;
-	bool cff_short_vmtx;
-	bool merge_lookups;
-	bool merge_features;
-	bool force_cid;
-	bool cff_rollCharString;
-	bool cff_doSubroutinize;
-	bool stub_cmap4;
-	bool decimal_cmap;
-	bool name_glyphs_by_hash;
-	bool name_glyphs_by_gid;
-	char *glyph_name_prefix;
-	otfcc_ILogger *logger;
-} otfcc_Options;
+#include <string>
 
-otfcc_Options *otfcc_newOptions();
-void otfcc_deleteOptions(otfcc_Options *options);
-void otfcc_Options_optimizeTo(otfcc_Options *options, uint8_t level);
+namespace otfcc {
 
-#endif
+struct options_t {
+	bool debug_wait_on_start = false;
+	bool ignore_glyph_order = false;
+	bool ignore_hints = false;
+	bool has_vertical_metrics = false;
+	bool export_fdselect = false;
+	bool keep_average_char_width = false;
+	bool keep_unicode_ranges = false;
+	bool short_post = false;
+	bool dummy_DSIG = false;
+	bool keep_modified_time = false;
+	bool instr_as_bytes = false;
+	bool verbose = false;
+	bool quiet = false;
+	bool cff_short_vmtx = false;
+	bool merge_lookups = false;
+	bool merge_features = false;
+	bool force_cid = false;
+	bool cff_rollCharString = false;
+	bool cff_doSubroutinize = false;
+	bool stub_cmap4 = false;
+	bool decimal_cmap = true;
+	bool name_glyphs_by_hash = false;
+	bool name_glyphs_by_gid = false;
+	std::string glyph_name_prefix;
+	mutable logger_t logger;
+
+	options_t();
+	options_t(std::string &&prog);
+	options_t(logger_t &&logger);
+	~options_t() = default;
+
+	void optimize_to(uint8_t level);
+};
+
+} // namespace otfcc

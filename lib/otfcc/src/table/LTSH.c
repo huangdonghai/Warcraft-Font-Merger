@@ -7,7 +7,7 @@ static INLINE void disposeLTSH(MOVE table_LTSH *ltsh) {
 }
 caryll_standardRefType(table_LTSH, table_iLTSH, disposeLTSH);
 
-table_LTSH *otfcc_readLTSH(const otfcc_Packet packet, const otfcc_Options *options) {
+table_LTSH *otfcc_readLTSH(const otfcc_Packet packet, const otfcc::options_t &options) {
 	FOR_TABLE('LTSH', table) {
 		font_file_pointer data = table.data;
 
@@ -22,7 +22,7 @@ table_LTSH *otfcc_readLTSH(const otfcc_Packet packet, const otfcc_Options *optio
 	}
 	return NULL;
 }
-caryll_Buffer *otfcc_buildLTSH(const table_LTSH *ltsh, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildLTSH(const table_LTSH *ltsh, const otfcc::options_t &options) {
 	if (!ltsh) return NULL;
 	caryll_Buffer *buf = bufnew();
 	bufwrite16b(buf, 0);

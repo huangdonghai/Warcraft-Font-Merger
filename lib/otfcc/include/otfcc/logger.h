@@ -1,35 +1,75 @@
-#ifndef CARYLL_INCLUDE_LOGGER_H
-#define CARYLL_INCLUDE_LOGGER_H
+#pragma once
 
-#include "sds.h"
-#include "caryll/ownership.h"
-#include "primitives.h"
+#include <memory>
+#include <type_traits>
 
-typedef struct otfcc_ILoggerTarget {
-	void (*dispose)(struct otfcc_ILoggerTarget *self);             // destructor
-	void (*push)(struct otfcc_ILoggerTarget *self, MOVE sds data); // push data
-} otfcc_ILoggerTarget;
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <fmt/core.h>
 
-typedef enum { log_type_error = 0, log_type_warning = 1, log_type_info = 2, log_type_progress = 3 } otfcc_LoggerType;
-enum { log_vl_critical = 0, log_vl_important = 1, log_vl_notice = 2, log_vl_info = 5, log_vl_progress = 10 };
+namespace otfcc {
 
-typedef struct otfcc_ILogger {
-	void (*dispose)(struct otfcc_ILogger *self);                     // destructor
-	void (*indent)(struct otfcc_ILogger *self, const char *segment); // add a level
-	void (*indentSDS)(struct otfcc_ILogger *self, MOVE sds segment); // add a level, using SDS
-	void (*start)(struct otfcc_ILogger *self, const char *segment);  // add a level, output a progress
-	void (*startSDS)(struct otfcc_ILogger *self, MOVE sds segment);  // add a level, output a progress
-	void (*log)(struct otfcc_ILogger *self, uint8_t verbosity, otfcc_LoggerType type, const char *data); // log a data
-	void (*logSDS)(struct otfcc_ILogger *self, uint8_t verbosity, otfcc_LoggerType type, MOVE sds data); // log a data
-	void (*dedent)(struct otfcc_ILogger *self);                          // remove a level
-	void (*finish)(struct otfcc_ILogger *self);                          // remove a level, finishing a ask
-	void (*end)(struct otfcc_ILogger *self);                             // remove a level
-	void (*setVerbosity)(struct otfcc_ILogger *self, uint8_t verbosity); // remove a level
-	otfcc_ILoggerTarget *(*getTarget)(struct otfcc_ILogger *self);       // query target
-} otfcc_ILogger;
+struct logger_t {
 
-otfcc_ILogger *otfcc_newLogger(otfcc_ILoggerTarget *target);
-otfcc_ILoggerTarget *otfcc_newStdErrTarget();
-otfcc_ILoggerTarget *otfcc_newEmptyTarget();
+	std::shared_ptr<spdlog::logger> _spd_logger;
 
-#endif
+	std::vector<std::string> _indents;
+	uint16_t _last_level;
+
+	logger_t(std::string &&prog);
+	logger_t(std::shared_ptr<spdlog::logger> spd_logger = spdlog::stderr_color_st("console"));
+	logger_t(const logger_t &) = delete;
+	logger_t(logger_t &&) = default;
+	logger_t &operator=(const logger_t &) = delete;
+	logger_t &operator=(logger_t &&) = default;
+	~logger_t() = default;
+
+	void indent(std::string segment);
+	void start(std::string segment);
+	void log(spdlog::level::level_enum level, const std::string &msg);
+	void dedent();
+	void finish();
+
+	void set_level(spdlog::level::level_enum level);
+
+	template <typename T> void trace(const T &msg) {
+		log(spdlog::level::trace, msg);
+	}
+	template <typename T> void info(const T &msg) {
+		log(spdlog::level::info, msg);
+	}
+	template <typename T> void warn(const T &msg) {
+		log(spdlog::level::warn, msg);
+	}
+	template <typename T> void error(const T &msg) {
+		log(spdlog::level::err, msg);
+	}
+
+	template <typename... Args>
+	void log(spdlog::level::level_enum level, const char *fmt, Args &&...args) {
+		log(level, fmt::format(fmt::runtime(fmt), std::forward<Args>(args)...));
+	}
+	template <typename... Args> void trace(const char *fmt, Args &&...args) {
+		log(spdlog::level::trace, fmt, std::forward<Args>(args)...);
+	}
+	template <typename... Args> void info(const char *fmt, Args &&...args) {
+		log(spdlog::level::info, fmt, std::forward<Args>(args)...);
+	}
+	template <typename... Args> void warn(const char *fmt, Args &&...args) {
+		log(spdlog::level::warn, fmt, std::forward<Args>(args)...);
+	}
+	template <typename... Args> void error(const char *fmt, Args &&...args) {
+		log(spdlog::level::err, fmt, std::forward<Args>(args)...);
+	}
+};
+
+struct logged_step_t {
+	logger_t &_logger;
+
+	logged_step_t(logger_t &logger, std::string segment);
+	~logged_step_t();
+};
+
+} // namespace otfcc
+
+#define loggedStep(segment) if (otfcc::logged_step_t logged_step(options.logger, segment); true)

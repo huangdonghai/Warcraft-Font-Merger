@@ -5,13 +5,15 @@
     * Adobe TinTin
 */
 
+#include "libcff.h"
+
+#include <intl.hpp>
+
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "libcff.h"
 
 static void parse_encoding(cff_File *cff, int32_t offset, cff_Encoding *enc) {
 	uint8_t *data = cff->raw_data;
@@ -60,7 +62,7 @@ static void parse_encoding(cff_File *cff, int32_t offset, cff_Encoding *enc) {
 	}
 }
 
-static void parse_cff_bytecode(cff_File *cff, const otfcc_Options *options) {
+static void parse_cff_bytecode(cff_File *cff, const otfcc::options_t &options) {
 	uint32_t pos;
 	int32_t offset;
 
@@ -81,7 +83,7 @@ static void parse_cff_bytecode(cff_File *cff, const otfcc_Options *options) {
 	/** LINT CFF FONTSET **/
 
 	if (cff->name.count != cff->top_dict.count)
-		logWarning("[libcff] Bad CFF font: (%d, name), (%d, top_dict).\n", cff->name.count,
+		logWarning(_("[libcff] Bad CFF font: ({0}, name), ({1}, top_dict)."), cff->name.count,
 		           cff->top_dict.count);
 
 	/* String INDEX */
@@ -112,7 +114,7 @@ static void parse_cff_bytecode(cff_File *cff, const otfcc_Options *options) {
 			cff->cnt_glyph = cff->char_strings.count;
 		} else {
 			cff_iIndex.empty(&cff->char_strings);
-			logWarning("[libcff] Bad CFF font: no any glyph data.\n");
+			logWarning(_("[libcff] Bad CFF font: no any glyph data."));
 		}
 
 		/* Encodings */
@@ -198,7 +200,7 @@ static void parse_cff_bytecode(cff_File *cff, const otfcc_Options *options) {
 	}
 }
 
-cff_File *cff_openStream(uint8_t *data, uint32_t len, const otfcc_Options *options) {
+cff_File *cff_openStream(uint8_t *data, uint32_t len, const otfcc::options_t &options) {
 	cff_File *file;
 	NEW(file);
 
@@ -331,9 +333,9 @@ static double callback_nopgetrand(void *context) {
 #define CHECK_STACK_TOP(op, n)                                                                     \
 	{                                                                                              \
 		if (stack->index < n) {                                                                    \
-			logWarning("[libcff] Stack cannot provide enough parameters for %s (%04x). This "      \
-			           "operation is ignored.\n",                                                  \
-			           #op, op);                                                                   \
+			logWarning(_("[libcff] Stack cannot provide enough parameters for {0} {1:04x}. This "  \
+			             "operation is ignored."),                                                 \
+			           #op, unsigned(op));                                                         \
 			break;                                                                                 \
 		}                                                                                          \
 	}
@@ -341,7 +343,7 @@ static double callback_nopgetrand(void *context) {
 // CFF charastring parser
 void cff_parseOutline(uint8_t *data, uint32_t len, cff_Index gsubr, cff_Index lsubr,
                       cff_Stack *stack, void *outline, cff_IOutlineBuilder methods,
-                      const otfcc_Options *options) {
+                      const otfcc::options_t &options) {
 	uint16_t gsubr_bias = compute_subr_bias(gsubr.count);
 	uint16_t lsubr_bias = compute_subr_bias(lsubr.count);
 	uint8_t *start = data;
@@ -830,8 +832,8 @@ void cff_parseOutline(uint8_t *data, uint32_t len, cff_Index gsubr, cff_Index ls
 						break;
 					}
 					default: {
-						logWarning("Warning: unknown operator %d occurs in Type 2 CharString. It "
-						           "may caused by file corruption.",
+						logWarning(_("Unknown operator {} occurs in Type 2 CharString. It may "
+						             "caused by file corruption."),
 						           val.i);
 						return;
 					}

@@ -3,9 +3,9 @@
 
 #include "otfcc/table/_TSI.h"
 
-table_TSI *otfcc_readTSI(const otfcc_Packet packet, const otfcc_Options *options, uint32_t tagIndex, uint32_t tagText);
-void otfcc_dumpTSI(const table_TSI *table, json_value *root, const otfcc_Options *options, const char *tag);
-table_TSI *otfcc_parseTSI(const json_value *root, const otfcc_Options *options, const char *tag);
+table_TSI *otfcc_readTSI(const otfcc_Packet packet, const otfcc::options_t &options, uint32_t tagIndex, uint32_t tagText);
+void otfcc_dumpTSI(const table_TSI *table, json_value *root, const otfcc::options_t &options, const char *tag);
+table_TSI *otfcc_parseTSI(const json_value *root, const otfcc::options_t &options, const char *tag);
 
 // TSI tables has two parts: an Index part and a Text part, so we need a struct.
 typedef struct {
@@ -13,6 +13,6 @@ typedef struct {
 	caryll_Buffer *textPart;
 } tsi_BuildTarget;
 
-tsi_BuildTarget otfcc_buildTSI(const table_TSI *TSI, const otfcc_Options *options);
+tsi_BuildTarget otfcc_buildTSI(const table_TSI *TSI, const otfcc::options_t &options);
 
 #endif

@@ -3,7 +3,7 @@
 
 #include "otfcc/table/VORG.h"
 
-table_VORG *otfcc_readVORG(const otfcc_Packet packet, const otfcc_Options *options);
-caryll_Buffer *otfcc_buildVORG(const table_VORG *table, const otfcc_Options *options);
+table_VORG *otfcc_readVORG(const otfcc_Packet packet, const otfcc::options_t &options);
+caryll_Buffer *otfcc_buildVORG(const table_VORG *table, const otfcc::options_t &options);
 
 #endif

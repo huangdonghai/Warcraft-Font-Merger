@@ -4,6 +4,6 @@
 #include "otfcc/font.h"
 #include "table/all.h"
 
-void otfcc_unconsolidateFont(otfcc_Font *font, const otfcc_Options *options);
+void otfcc_unconsolidateFont(otfcc_Font *font, const otfcc::options_t &options);
 
 #endif

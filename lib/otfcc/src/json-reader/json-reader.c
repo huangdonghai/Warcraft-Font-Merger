@@ -2,6 +2,8 @@
 #include "otfcc/font.h"
 #include "table/all.h"
 
+#include <intl.hpp>
+
 static otfcc_font_subtype otfcc_decideFontSubtypeFromJson(const json_value *root) {
 	if (json_obj_get_type(root, "CFF_", json_object) != NULL) {
 		return FONTTYPE_CFF;
@@ -106,7 +108,7 @@ static void placeOrderEntriesFromSubtable(json_value *table, otfcc_GlyphOrder *g
 	}
 }
 
-static otfcc_GlyphOrder *parseGlyphOrder(const json_value *root, const otfcc_Options *options) {
+static otfcc_GlyphOrder *parseGlyphOrder(const json_value *root, const otfcc::options_t &options) {
 	otfcc_GlyphOrder *go = GlyphOrder.create();
 	if (root->type != json_object) return go;
 	json_value *table;
@@ -117,9 +119,9 @@ static otfcc_GlyphOrder *parseGlyphOrder(const json_value *root, const otfcc_Opt
 			placeOrderEntriesFromCmap(table, go);
 		}
 		if ((table = json_obj_get_type(root, "glyph_order", json_array))) {
-			bool ignoreGlyphOrder = options->ignore_glyph_order;
+			bool ignoreGlyphOrder = options.ignore_glyph_order;
 			if (ignoreGlyphOrder && !!json_obj_get_type(root, "SVG_", json_array)) {
-				logNotice("OpenType SVG table detected. Glyph order is preserved.");
+				logNotice(_("OpenType SVG table detected. Glyph order is preserved."));
 				ignoreGlyphOrder = false;
 			}
 			placeOrderEntriesFromSubtable(table, go, ignoreGlyphOrder);
@@ -129,7 +131,7 @@ static otfcc_GlyphOrder *parseGlyphOrder(const json_value *root, const otfcc_Opt
 	return go;
 }
 
-static otfcc_Font *readJson(void *_root, uint32_t index, const otfcc_Options *options) {
+static otfcc_Font *readJson(void *_root, uint32_t index, const otfcc::options_t &options) {
 	const json_value *root = (json_value *)_root;
 	otfcc_Font *font = otfcc_iFont.create();
 	if (!font) return NULL;
@@ -145,7 +147,7 @@ static otfcc_Font *readJson(void *_root, uint32_t index, const otfcc_Options *op
 	font->name = otfcc_parseName(root, options);
 	font->meta = otfcc_parseMeta(root, options);
 	font->cmap = otfcc_parseCmap(root, options);
-	if (!options->ignore_hints) {
+	if (!options.ignore_hints) {
 		font->fpgm = otfcc_parseFpgmPrep(root, options, "fpgm");
 		font->prep = otfcc_parseFpgmPrep(root, options, "prep");
 		font->cvt_ = otfcc_parseCvt(root, options, "cvt_");

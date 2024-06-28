@@ -1,5 +1,7 @@
 #include "name.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 #include "support/unicodeconv/unicodeconv.h"
 
@@ -32,7 +34,7 @@ static bool shouldDecodeAsBytes(const otfcc_NameRecord *record) {
 	       record->languageID == 0; // Mac Roman English - I hope
 }
 
-table_name *otfcc_readName(const otfcc_Packet packet, const otfcc_Options *options) {
+table_name *otfcc_readName(const otfcc_Packet packet, const otfcc::options_t &options) {
 	FOR_TABLE('name', table) {
 		table_name *name = NULL;
 		font_file_pointer data = table.data;
@@ -74,13 +76,13 @@ table_name *otfcc_readName(const otfcc_Packet packet, const otfcc_Options *optio
 		}
 		return name;
 	TABLE_NAME_CORRUPTED:
-		logWarning("table 'name' corrupted.\n");
+		logWarning(_("table 'name' corrupted."));
 		if (name) { DELETE(table_iName.free, name); }
 	}
 	return NULL;
 }
 
-void otfcc_dumpName(const table_name *name, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpName(const table_name *name, json_value *root, const otfcc::options_t &options) {
 	if (!name) return;
 	loggedStep("name") {
 		json_value *_name = json_array_new(name->length);
@@ -105,7 +107,7 @@ static int name_record_sort(const otfcc_NameRecord *a, const otfcc_NameRecord *b
 	if (a->languageID != b->languageID) return a->languageID - b->languageID;
 	return a->nameID - b->nameID;
 }
-table_name *otfcc_parseName(const json_value *root, const otfcc_Options *options) {
+table_name *otfcc_parseName(const json_value *root, const otfcc::options_t &options) {
 	table_name *name = table_iName.create();
 	json_value *table = NULL;
 	if ((table = json_obj_get_type(root, "name", json_array))) {
@@ -116,23 +118,23 @@ table_name *otfcc_parseName(const json_value *root, const otfcc_Options *options
 					continue;
 				json_value *_record = table->u.array.values[j];
 				if (!json_obj_get_type(_record, "platformID", json_integer)) {
-					logWarning("Missing or invalid platformID for name entry %d\n", j);
+					logWarning(_("Missing or invalid platformID for name entry {}"), j);
 					continue;
 				}
 				if (!json_obj_get_type(_record, "encodingID", json_integer)) {
-					logWarning("Missing or invalid encodingID for name entry %d\n", j);
+					logWarning(_("Missing or invalid encodingID for name entry {}"), j);
 					continue;
 				}
 				if (!json_obj_get_type(_record, "languageID", json_integer)) {
-					logWarning("Missing or invalid languageID for name entry %d\n", j);
+					logWarning(_("Missing or invalid languageID for name entry {}"), j);
 					continue;
 				}
 				if (!json_obj_get_type(_record, "nameID", json_integer)) {
-					logWarning("Missing or invalid nameID for name entry %d\n", j);
+					logWarning(_("Missing or invalid nameID for name entry {}"), j);
 					continue;
 				}
 				if (!json_obj_get_type(_record, "nameString", json_string)) {
-					logWarning("Missing or invalid name string for name entry %d\n", j);
+					logWarning(_("Missing or invalid name string for name entry {}"), j);
 					continue;
 				}
 				otfcc_NameRecord record;
@@ -151,7 +153,7 @@ table_name *otfcc_parseName(const json_value *root, const otfcc_Options *options
 	}
 	return name;
 }
-caryll_Buffer *otfcc_buildName(const table_name *name, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildName(const table_name *name, const otfcc::options_t &options) {
 	if (!name) return NULL;
 	caryll_Buffer *buf = bufnew();
 	bufwrite16b(buf, 0);

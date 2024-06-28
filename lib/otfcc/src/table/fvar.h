@@ -3,7 +3,7 @@
 
 #include "otfcc/table/fvar.h"
 
-table_fvar *otfcc_readFvar(const otfcc_Packet packet, const otfcc_Options *options);
-void otfcc_dumpFvar(const table_fvar *table, json_value *root, const otfcc_Options *options);
+table_fvar *otfcc_readFvar(const otfcc_Packet packet, const otfcc::options_t &options);
+void otfcc_dumpFvar(const table_fvar *table, json_value *root, const otfcc::options_t &options);
 
 #endif

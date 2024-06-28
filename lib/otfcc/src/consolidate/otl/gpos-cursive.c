@@ -1,5 +1,7 @@
 #include "gpos-cursive.h"
 
+#include <intl.hpp>
+
 typedef struct {
 	int fromid;
 	sds fromname;
@@ -11,12 +13,13 @@ static int gpos_cursive_by_from_id(gpos_cursive_hash *a, gpos_cursive_hash *b) {
 	return a->fromid - b->fromid;
 }
 bool consolidate_gpos_cursive(otfcc_Font *font, table_OTL *table, otl_Subtable *_subtable,
-                              const otfcc_Options *options) {
+                              const otfcc::options_t &options) {
 	subtable_gpos_cursive *subtable = &(_subtable->gpos_cursive);
 	gpos_cursive_hash *h = NULL;
 	for (glyphid_t k = 0; k < subtable->length; k++) {
 		if (!GlyphOrder.consolidateHandle(font->glyph_order, &subtable->items[k].target)) {
-			logWarning("[Consolidate] Ignored missing glyph /%s.\n", subtable->items[k].target.name);
+			logWarning(_("[Consolidate] Ignored missing glyph /{}."),
+			           subtable->items[k].target.name);
 			continue;
 		}
 
@@ -24,7 +27,7 @@ bool consolidate_gpos_cursive(otfcc_Font *font, table_OTL *table, otl_Subtable *
 		int fromid = subtable->items[k].target.index;
 		HASH_FIND_INT(h, &fromid, s);
 		if (s) {
-			logWarning("[Consolidate] Double-mapping a glyph in a cursive positioning /%s.\n",
+			logWarning(_("[Consolidate] Double-mapping a glyph in a cursive positioning /{}."),
 			           subtable->items[k].target.name);
 		} else {
 			NEW(s);

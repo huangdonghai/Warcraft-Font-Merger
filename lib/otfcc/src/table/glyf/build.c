@@ -180,7 +180,7 @@ static void glyf_build_composite(const glyf_Glyph *g, caryll_Buffer *gbuf) {
 	}
 }
 table_GlyfAndLocaBuffers otfcc_buildGlyf(const table_glyf *table, table_head *head,
-                                         const otfcc_Options *options) {
+                                         const otfcc::options_t &options) {
 	caryll_Buffer *bufglyf = bufnew();
 	caryll_Buffer *bufloca = bufnew();
 	if (table && head) {

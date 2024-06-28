@@ -20,7 +20,7 @@ typedef struct {
 void otl_readMarkArray(otl_MarkArray *array, otl_Coverage *cov, font_file_pointer data,
                        uint32_t tableLength, uint32_t offset);
 void otl_parseMarkArray(json_value *_marks, otl_MarkArray *array, otl_ClassnameHash **h,
-                        const otfcc_Options *options);
+                        const otfcc::options_t &options);
 
 // position values
 extern const uint8_t FORMAT_DX;

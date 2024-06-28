@@ -1,5 +1,7 @@
 #include "head.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 
 static INLINE void initHead(table_head *head) {
@@ -12,13 +14,13 @@ static INLINE void disposeHead(table_head *head) {
 }
 caryll_standardRefType(table_head, table_iHead, initHead, disposeHead);
 
-table_head *otfcc_readHead(const otfcc_Packet packet, const otfcc_Options *options) {
+table_head *otfcc_readHead(const otfcc_Packet packet, const otfcc::options_t &options) {
 	FOR_TABLE('head', table) {
 		font_file_pointer data = table.data;
 		uint32_t length = table.length;
 
 		if (length < 54) {
-			logWarning("table 'head' corrupted.\n");
+			logWarning(_("table 'head' corrupted."));
 		} else {
 			table_head *head;
 			NEW(head);
@@ -64,7 +66,7 @@ static const char *headFlagsLabels[] = {"baselineAtY_0",
 static const char *macStyleLabels[] = {"bold",   "italic",    "underline", "outline",
                                        "shadow", "condensed", "extended",  NULL};
 
-void otfcc_dumpHead(const table_head *table, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpHead(const table_head *table, json_value *root, const otfcc::options_t &options) {
 	if (!table) return;
 	loggedStep("head") {
 		json_value *head = json_object_new(15);
@@ -88,7 +90,7 @@ void otfcc_dumpHead(const table_head *table, json_value *root, const otfcc_Optio
 	}
 }
 
-table_head *otfcc_parseHead(const json_value *root, const otfcc_Options *options) {
+table_head *otfcc_parseHead(const json_value *root, const otfcc::options_t &options) {
 	table_head *head = table_iHead.create();
 	json_value *table = NULL;
 	if ((table = json_obj_get_type(root, "head", json_object))) {
@@ -113,7 +115,7 @@ table_head *otfcc_parseHead(const json_value *root, const otfcc_Options *options
 	return head;
 }
 
-caryll_Buffer *otfcc_buildHead(const table_head *head, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildHead(const table_head *head, const otfcc::options_t &options) {
 	if (!head) return NULL;
 	caryll_Buffer *buf = bufnew();
 	bufwrite32b(buf, head->version);

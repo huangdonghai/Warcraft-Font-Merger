@@ -419,11 +419,11 @@ static uint8_t decideAdvance(cff_CharstringIL *il, uint32_t j, uint8_t optimizeL
 	return 1;                         // nothing match
 }
 
-void cff_optimizeIL(cff_CharstringIL *il, const otfcc_Options *options) {
-	if (!options->cff_rollCharString) return;
+void cff_optimizeIL(cff_CharstringIL *il, const otfcc::options_t &options) {
+	if (!options.cff_rollCharString) return;
 	uint32_t j = 0;
 	while (j < il->length) {
-		j += decideAdvance(il, j, options->cff_rollCharString);
+		j += decideAdvance(il, j, options.cff_rollCharString);
 	}
 }
 

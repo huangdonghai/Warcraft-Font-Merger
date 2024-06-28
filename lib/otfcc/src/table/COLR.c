@@ -1,5 +1,7 @@
 #include "COLR.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 #include "bk/bkgraph.h"
 
@@ -34,7 +36,7 @@ caryll_standardVectorImpl(table_COLR, colr_Mapping, colr_iMapping, table_iCOLR);
 static const size_t baseGlyphRecLength = 6;
 static const size_t layerRecLength = 4;
 
-table_COLR *otfcc_readCOLR(const otfcc_Packet packet, const otfcc_Options *options) {
+table_COLR *otfcc_readCOLR(const otfcc_Packet packet, const otfcc::options_t &options) {
 	table_COLR *colr = NULL;
 	FOR_TABLE('COLR', table) {
 		if (table.length < 14) goto FAIL;
@@ -85,14 +87,14 @@ table_COLR *otfcc_readCOLR(const otfcc_Packet packet, const otfcc_Options *optio
 		}
 		return colr;
 	FAIL:
-		logWarning("Table 'COLR' corrupted.\n");
+		logWarning(_("Table 'COLR' corrupted."));
 		table_iCOLR.free(colr);
 		colr = NULL;
 	}
 	return colr;
 }
 
-void otfcc_dumpCOLR(const table_COLR *colr, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpCOLR(const table_COLR *colr, json_value *root, const otfcc::options_t &options) {
 	if (!colr) return;
 	loggedStep("COLR") {
 		json_value *_colr = json_array_new(colr->length);
@@ -113,7 +115,7 @@ void otfcc_dumpCOLR(const table_COLR *colr, json_value *root, const otfcc_Option
 	}
 }
 
-table_COLR *otfcc_parseCOLR(const json_value *root, const otfcc_Options *options) {
+table_COLR *otfcc_parseCOLR(const json_value *root, const otfcc::options_t &options) {
 	json_value *_colr = NULL;
 	if (!(_colr = json_obj_get_type(root, "COLR", json_array))) return NULL;
 	table_COLR *colr = table_iCOLR.create();
@@ -152,7 +154,7 @@ static int byGID(const colr_Mapping *a, const colr_Mapping *b) {
 	return a->glyph.index - b->glyph.index;
 }
 
-caryll_Buffer *otfcc_buildCOLR(const table_COLR *_colr, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildCOLR(const table_COLR *_colr, const otfcc::options_t &options) {
 	if (!_colr || !_colr->length) return NULL;
 
 	// sort base defs

@@ -31,7 +31,7 @@ caryll_standardRefType(table_CPAL, table_iCPAL, initCPAL, disposeCPAL);
 
 const cpal_Color white = {.red = 0xFF, .green = 0xFF, .blue = 0xFF, .alpha = 0xFF, .label = 0xFFFF};
 
-table_CPAL *otfcc_readCPAL(const otfcc_Packet packet, const otfcc_Options *options) {
+table_CPAL *otfcc_readCPAL(const otfcc_Packet packet, const otfcc::options_t &options) {
 	table_CPAL *t = NULL;
 	FOR_TABLE('CPAL', table) {
 		font_file_pointer data = table.data;
@@ -146,7 +146,7 @@ static INLINE json_value *dumpPalette(cpal_Palette *palette) {
 	return _palette;
 }
 
-void otfcc_dumpCPAL(const table_CPAL *table, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpCPAL(const table_CPAL *table, json_value *root, const otfcc::options_t &options) {
 	if (!table) return;
 	loggedStep("CPAL") {
 		json_value *_t = json_object_new(2);
@@ -171,7 +171,7 @@ static INLINE cpal_Color parseColor(const json_value *_color) {
 	return color;
 }
 
-table_CPAL *otfcc_parseCPAL(const json_value *root, const otfcc_Options *options) {
+table_CPAL *otfcc_parseCPAL(const json_value *root, const otfcc::options_t &options) {
 	json_value *table = NULL;
 	if (!(table = json_obj_get_type(root, "CPAL", json_object))) return NULL;
 	table_CPAL *cpal = NULL;
@@ -241,7 +241,7 @@ static INLINE bk_Block *buildPaletteEntryLabel(const table_CPAL *cpal) {
 	}
 	return block;
 }
-caryll_Buffer *otfcc_buildCPAL(const table_CPAL *cpal, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildCPAL(const table_CPAL *cpal, const otfcc::options_t &options) {
 	if (!cpal || !cpal->palettes.length) return NULL;
 	uint16_t numPalettes = cpal->palettes.length;
 	uint16_t numPalettesEntries = cpal->palettes.items[0].colorset.length;

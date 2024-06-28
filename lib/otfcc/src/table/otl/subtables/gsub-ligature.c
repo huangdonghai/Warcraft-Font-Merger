@@ -12,7 +12,7 @@ caryll_standardVectorImpl(subtable_gsub_ligature, otl_GsubLigatureEntry, gss_typ
 
 otl_Subtable *otl_read_gsub_ligature(const font_file_pointer data, uint32_t tableLength,
                                      uint32_t offset, const glyphid_t maxGlyphs,
-                                     const otfcc_Options *options) {
+                                     const otfcc::options_t &options) {
 	subtable_gsub_ligature *subtable = iSubtable_gsub_ligature.create();
 	checkLength(offset + 6);
 
@@ -76,7 +76,7 @@ json_value *otl_gsub_dump_ligature(const otl_Subtable *_subtable) {
 	return ret;
 }
 
-otl_Subtable *otl_gsub_parse_ligature(const json_value *_subtable, const otfcc_Options *options) {
+otl_Subtable *otl_gsub_parse_ligature(const json_value *_subtable, const otfcc::options_t &options) {
 	if (json_obj_get_type(_subtable, "substitutions", json_array)) {
 		_subtable = json_obj_get_type(_subtable, "substitutions", json_array);
 

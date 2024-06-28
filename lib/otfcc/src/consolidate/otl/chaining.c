@@ -1,10 +1,12 @@
 #include "chaining.h"
 
+#include <intl.hpp>
+
 bool consolidate_chaining(otfcc_Font *font, table_OTL *table, otl_Subtable *_subtable,
-                          const otfcc_Options *options) {
+                          const otfcc::options_t &options) {
 	subtable_chaining *subtable = &(_subtable->chaining);
 	if (subtable->type) {
-		logWarning("[Consolidate] Ignoring non-canonical chaining subtable.");
+		logWarning(_("[Consolidate] Ignoring non-canonical chaining subtable."));
 		return false;
 	}
 	otl_ChainingRule *rule = &(subtable->rule);
@@ -28,14 +30,14 @@ bool consolidate_chaining(otfcc_Font *font, table_OTL *table, otl_Subtable *_sub
 				Handle.consolidateTo(h, k, table->lookups.items[k]->name);
 			}
 			if (!foundLookup && rule->apply[j].lookup.name) {
-				logWarning("[Consolidate] Quoting an invalid lookup %s. This lookup application is "
-				           "ignored.",
+				logWarning(_("[Consolidate] Quoting an invalid lookup {}. This lookup application "
+				             "is ignored."),
 				           rule->apply[j].lookup.name);
 				Handle.dispose(&rule->apply[j].lookup);
 			}
 		} else if (h->state == HANDLE_STATE_INDEX) {
 			if (h->index >= table->lookups.length) {
-				logWarning("[Consolidate] Quoting an invalid lookup #%d.", h->index);
+				logWarning(_("[Consolidate] Quoting an invalid lookup #{}."), h->index);
 				h->index = 0;
 			}
 			Handle.consolidateTo(h, h->index, table->lookups.items[h->index]->name);

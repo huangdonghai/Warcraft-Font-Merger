@@ -36,7 +36,7 @@ static int compare_classHash(otl_ClassnameHash *a, otl_ClassnameHash *b) {
 	return strcmp(a->className, b->className);
 }
 void otl_parseMarkArray(json_value *_marks, otl_MarkArray *array, otl_ClassnameHash **h,
-                        const otfcc_Options *options) {
+                        const otfcc::options_t &options) {
 	for (glyphid_t j = 0; j < _marks->u.object.length; j++) {
 		otl_MarkRecord mark;
 		char *gname = _marks->u.object.values[j].name;

@@ -18,10 +18,10 @@ typedef struct {
 	uint32_t count;
 	uint32_t header;
 	otfcc_SFNTTableEntry *tables;
-	const otfcc_Options *options;
+	const otfcc::options_t *options;
 } otfcc_SFNTBuilder;
 
-otfcc_SFNTBuilder *otfcc_newSFNTBuilder(uint32_t header, const otfcc_Options *options);
+otfcc_SFNTBuilder *otfcc_newSFNTBuilder(uint32_t header, const otfcc::options_t &options);
 void otfcc_SFNTBuilder_pushTable(otfcc_SFNTBuilder *builder, uint32_t tag, caryll_Buffer *buffer);
 void otfcc_deleteSFNTBuilder(otfcc_SFNTBuilder *builder);
 

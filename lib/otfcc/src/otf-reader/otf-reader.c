@@ -12,7 +12,7 @@ static otfcc_font_subtype decideFontSubtypeOTF(otfcc_SplineFontContainer *sfnt, 
 	return FONTTYPE_TTF;
 }
 
-static otfcc_Font *readOtf(void *_sfnt, uint32_t index, const otfcc_Options *options) {
+static otfcc_Font *readOtf(void *_sfnt, uint32_t index, const otfcc::options_t &options) {
 	otfcc_SplineFontContainer *sfnt = (otfcc_SplineFontContainer *)_sfnt;
 	if (sfnt->count - 1 < index) {
 		return NULL;

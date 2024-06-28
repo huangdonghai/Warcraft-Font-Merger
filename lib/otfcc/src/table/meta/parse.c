@@ -24,7 +24,7 @@ sds parseMetaData(const json_value *v) {
 	return NULL;
 }
 
-table_meta *otfcc_parseMeta(const json_value *root, const otfcc_Options *options) {
+table_meta *otfcc_parseMeta(const json_value *root, const otfcc::options_t &options) {
 	json_value *_meta = NULL;
 	if (!(_meta = json_obj_get_type(root, "meta", json_object))) return NULL;
 	json_value *_meta_entries = NULL;

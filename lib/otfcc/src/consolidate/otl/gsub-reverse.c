@@ -1,5 +1,7 @@
 #include "gsub-reverse.h"
 
+#include <intl.hpp>
+
 typedef struct {
 	int fromid;
 	sds fromname;
@@ -12,7 +14,7 @@ static int by_from_id(gsub_single_map_hash *a, gsub_single_map_hash *b) {
 }
 
 bool consolidate_gsub_reverse(otfcc_Font *font, table_OTL *table, otl_Subtable *_subtable,
-                              const otfcc_Options *options) {
+                              const otfcc::options_t &options) {
 	subtable_gsub_reverse *subtable = &(_subtable->gsub_reverse);
 	for (tableid_t j = 0; j < subtable->matchCount; j++) {
 		fontop_consolidateCoverage(font, subtable->match[j], options);
@@ -26,7 +28,7 @@ bool consolidate_gsub_reverse(otfcc_Font *font, table_OTL *table, otl_Subtable *
 		int fromid = from->glyphs[k].index;
 		HASH_FIND_INT(h, &fromid, s);
 		if (s) {
-			logWarning("[Consolidate] Double-mapping a glyph in a reverse substitution /%s.\n", from->glyphs[k].name);
+			logWarning(_("[Consolidate] Double-mapping a glyph in a reverse substitution /{}."), from->glyphs[k].name);
 		} else {
 			NEW(s);
 			s->fromid = from->glyphs[k].index;
@@ -38,7 +40,8 @@ bool consolidate_gsub_reverse(otfcc_Font *font, table_OTL *table, otl_Subtable *
 	}
 	HASH_SORT(h, by_from_id);
 	if (HASH_COUNT(h) != from->numGlyphs || HASH_COUNT(h) != subtable->to->numGlyphs) {
-		logWarning("[Consolidate] In this reverse subsitution lookup, some mappings are ignored.\n");
+		logWarning(
+		    _("[Consolidate] In this reverse subsitution lookup, some mappings are ignored."));
 	}
 	from->numGlyphs = HASH_COUNT(h);
 	subtable->to->numGlyphs = HASH_COUNT(h);

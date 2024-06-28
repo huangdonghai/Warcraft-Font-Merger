@@ -2,7 +2,7 @@
 #include "support/util.h"
 #include "table/all.h"
 
-static void *serializeToJson(otfcc_Font *font, const otfcc_Options *options) {
+static void *serializeToJson(otfcc_Font *font, const otfcc::options_t &options) {
 	json_value *root = json_object_new(48);
 	if (!root) return NULL;
 	otfcc_dumpFvar(font->fvar, root, options);
@@ -24,7 +24,7 @@ static void *serializeToJson(otfcc_Font *font, const otfcc_Options *options) {
 	                     .hasVerticalMetrics = !!(font->vhea),
 	                     .exportFDSelect = font->CFF_ && font->CFF_->isCID};
 	otfcc_dumpGlyf(font->glyf, root, options, &ctx);
-	if (!options->ignore_hints) {
+	if (!options.ignore_hints) {
 		table_dumpTableFpgmPrep(font->fpgm, root, options, "fpgm");
 		table_dumpTableFpgmPrep(font->prep, root, options, "prep");
 		otfcc_dumpCvt(font->cvt_, root, options, "cvt_");

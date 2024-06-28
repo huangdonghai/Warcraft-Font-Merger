@@ -1,9 +1,11 @@
 #include "../VDMX.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 #include "bk/bkgraph.h"
 
-table_VDMX *otfcc_readVDMX(const otfcc_Packet packet, const otfcc_Options *options) {
+table_VDMX *otfcc_readVDMX(const otfcc_Packet packet, const otfcc::options_t &options) {
 	table_VDMX *vdmx = NULL;
 	FOR_TABLE('VDMX', table) {
 		if (table.length < 6) goto FAIL;
@@ -41,14 +43,14 @@ table_VDMX *otfcc_readVDMX(const otfcc_Packet packet, const otfcc_Options *optio
 		}
 		return vdmx;
 	FAIL:
-		logWarning("Table 'VDMX' corrupted.\n");
+		logWarning(_("Table 'VDMX' corrupted."));
 		table_iVDMX.free(vdmx);
 		vdmx = NULL;
 	}
 	return vdmx;
 }
 
-void otfcc_dumpVDMX(const table_VDMX *vdmx, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpVDMX(const table_VDMX *vdmx, json_value *root, const otfcc::options_t &options) {
 	if (!vdmx) return;
 	loggedStep("VDMX") {
 		json_value *_vdmx = json_object_new(2);
@@ -78,7 +80,7 @@ void otfcc_dumpVDMX(const table_VDMX *vdmx, json_value *root, const otfcc_Option
 	}
 }
 
-table_VDMX *otfcc_parseVDMX(const json_value *root, const otfcc_Options *options) {
+table_VDMX *otfcc_parseVDMX(const json_value *root, const otfcc::options_t &options) {
 	json_value *_vdmx = NULL;
 	if (!(_vdmx = json_obj_get_type(root, "VDMX", json_object))) return NULL;
 	table_VDMX *vdmx = table_iVDMX.create();
@@ -114,7 +116,7 @@ table_VDMX *otfcc_parseVDMX(const json_value *root, const otfcc_Options *options
 	return vdmx;
 }
 
-caryll_Buffer *otfcc_buildVDMX(const table_VDMX *vdmx, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildVDMX(const table_VDMX *vdmx, const otfcc::options_t &options) {
 	if (!vdmx || !vdmx->ratios.length) return NULL;
 	bk_Block *root = bk_new_Block(b16, vdmx->version,       // Version
 	                              b16, vdmx->ratios.length, // numRecs

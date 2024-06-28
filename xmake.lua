@@ -30,24 +30,22 @@ target("merge-otd")
 target("otfccbuild")
 	set_kind("binary")
 	add_rules("static_binary")
-	add_deps("nowide")
+	add_deps("clipp", "fmt", "nowide", "spdlog")
 	add_deps("intl", "otfcc")
 	add_deps("config")
 	add_files(
-		"src/otfccbuild.c",
-		"src/stopwatch.cpp",
-		{sourcekind = "cxx"})
+		"src/otfccbuild.cpp",
+		"src/stopwatch.cpp")
 
 target("otfccdump")
 	set_kind("binary")
 	add_rules("static_binary")
-	add_deps("nowide")
+	add_deps("clipp", "fmt", "nowide", "spdlog")
 	add_deps("intl", "otfcc")
 	add_deps("config")
 	add_files(
-		"src/otfccdump.c",
-		"src/stopwatch.cpp",
-		{sourcekind = "cxx"})
+		"src/otfccdump.cpp",
+		"src/stopwatch.cpp")
 
 target("config")
 	set_kind("phony")

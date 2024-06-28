@@ -1,5 +1,7 @@
 #include "cmap.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 #include "bk/bkgraph.h"
 
@@ -272,7 +274,7 @@ static INLINE bool isValidCmapEncoding(uint16_t platform, uint16_t encoding) {
 const tableid_t formatPriorities[] = {12, 4, 0};
 
 // OTFCC will not support all `cmap` mappings.
-table_cmap *otfcc_readCmap(const otfcc_Packet packet, const otfcc_Options *options) {
+table_cmap *otfcc_readCmap(const otfcc_Packet packet, const otfcc::options_t &options) {
 	// the map is a reference to a hash table
 	table_cmap *cmap = NULL;
 	FOR_TABLE('cmap', table) {
@@ -312,13 +314,13 @@ table_cmap *otfcc_readCmap(const otfcc_Packet packet, const otfcc_Options *optio
 		return cmap;
 
 	CMAP_CORRUPTED:
-		logWarning("table 'cmap' corrupted.\n");
+		logWarning(_("table 'cmap' corrupted."));
 		if (cmap != NULL) { FREE(cmap), cmap = NULL; }
 	}
 	return NULL;
 }
 
-void otfcc_dumpCmap(const table_cmap *table, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpCmap(const table_cmap *table, json_value *root, const otfcc::options_t &options) {
 	if (!table) return;
 	loggedStep("cmap") {
 		if (table->unicodes) {
@@ -326,7 +328,7 @@ void otfcc_dumpCmap(const table_cmap *table, json_value *root, const otfcc_Optio
 			cmap_Entry *item;
 			foreach_hash(item, table->unicodes) if (item->glyph.name) {
 				sds key;
-				if (options->decimal_cmap) {
+				if (options.decimal_cmap) {
 					key = sdsfromlonglong(item->unicode);
 				} else {
 					key = sdscatprintf(sdsempty(), "U+%04X", item->unicode);
@@ -343,7 +345,7 @@ void otfcc_dumpCmap(const table_cmap *table, json_value *root, const otfcc_Optio
 			cmap_UVS_Entry *item;
 			foreach_hash(item, table->uvs) if (item->glyph.name) {
 				sds key;
-				if (options->decimal_cmap) {
+				if (options.decimal_cmap) {
 					key = sdscatprintf(sdsempty(), "%d %d", item->key.unicode, item->key.selector);
 				} else {
 					key = sdscatprintf(sdsempty(), "U+%04X U+%04X", item->key.unicode,
@@ -368,7 +370,7 @@ static INLINE unicode_t parseUnicode(const sds unicodeStr) {
 }
 
 static void parseCmapUnicodes(table_cmap *cmap, const json_value *table,
-                              const otfcc_Options *options) {
+                              const otfcc::options_t &options) {
 	if (!table || table->type != json_object) return;
 	for (uint32_t j = 0; j < table->u.object.length; j++) {
 		sds unicodeStr =
@@ -380,8 +382,8 @@ static void parseCmapUnicodes(table_cmap *cmap, const json_value *table,
 			sds gname = sdsnewlen(item->u.string.ptr, item->u.string.length);
 			if (!otfcc_encodeCmapByName(cmap, unicode, gname)) {
 				glyph_handle *currentMap = otfcc_cmapLookup(cmap, unicode);
-				logWarning("U+%04X is already mapped to %s. Assignment to %s is ignored.", unicode,
-				           currentMap->name, gname);
+				logWarning(_("U+{0:04X} is already mapped to {1}. Assignment to {2} is ignored."),
+				           unicode, currentMap->name, gname);
 			}
 		}
 	}
@@ -400,7 +402,7 @@ static INLINE cmap_UVS_key parseUVSKey(const sds uvsStr) {
 	return k;
 }
 
-static void parseCmapUVS(table_cmap *cmap, const json_value *table, const otfcc_Options *options) {
+static void parseCmapUVS(table_cmap *cmap, const json_value *table, const otfcc::options_t &options) {
 	if (!table || table->type != json_object) return;
 	for (uint32_t j = 0; j < table->u.object.length; j++) {
 		sds uvsStr =
@@ -412,15 +414,15 @@ static void parseCmapUVS(table_cmap *cmap, const json_value *table, const otfcc_
 			sds gname = sdsnewlen(item->u.string.ptr, item->u.string.length);
 			if (!otfcc_encodeCmapUVSByName(cmap, k, gname)) {
 				glyph_handle *currentMap = otfcc_cmapLookupUVS(cmap, k);
-				logWarning(
-				    "UVS U+%04X U+%04X is already mapped to %s. Assignment to %s is ignored.",
-				    k.unicode, k.selector, currentMap->name, gname);
+				logWarning(_("UVS U+{0:04X} U+{1:04X} is already mapped to {2}. Assignment to {3} "
+				             "is ignored."),
+				           k.unicode, k.selector, currentMap->name, gname);
 			}
 		}
 	}
 }
 
-table_cmap *otfcc_parseCmap(const json_value *root, const otfcc_Options *options) {
+table_cmap *otfcc_parseCmap(const json_value *root, const otfcc::options_t &options) {
 	if (root->type != json_object) return NULL;
 	table_cmap *cmap = table_iCmap.create();
 	loggedStep("cmap") {
@@ -722,7 +724,7 @@ static caryll_Buffer *otfcc_buildCmap_format14(const table_cmap *cmap) {
 	return buf;
 }
 
-caryll_Buffer *otfcc_buildCmap(const table_cmap *cmap, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildCmap(const table_cmap *cmap, const otfcc::options_t &options) {
 	if (!cmap || !cmap->unicodes) return NULL;
 
 	cmap_Entry *entry;
@@ -733,7 +735,7 @@ caryll_Buffer *otfcc_buildCmap(const table_cmap *cmap, const otfcc_Options *opti
 	}
 
 	caryll_Buffer *format4 = NULL;
-	if (!requiresFormat12 || !options->stub_cmap4) {
+	if (!requiresFormat12 || !options.stub_cmap4) {
 		format4 = otfcc_tryBuildCmap_format4(cmap);
 		if (!format4)
 			requiresFormat12 = true;

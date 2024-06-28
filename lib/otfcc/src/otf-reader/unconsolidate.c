@@ -137,13 +137,13 @@ GlyphHash nameGlyphByHash(glyf_Glyph *g, table_glyf *glyf) {
 //   2. Replace all glyph IDs into glyph names. Note all glyph references with
 //      same name whare one unique string entity stored in font->glyph_order.
 //      (Separate?)
-static otfcc_GlyphOrder *createGlyphOrder(otfcc_Font *font, const otfcc_Options *options) {
+static otfcc_GlyphOrder *createGlyphOrder(otfcc_Font *font, const otfcc::options_t &options) {
 	otfcc_GlyphOrder *glyph_order = GlyphOrder.create();
 
 	glyphid_t numGlyphs = font->glyf->length;
 	sds prefix;
-	if (options->glyph_name_prefix) {
-		prefix = sdsnew(options->glyph_name_prefix);
+	if (!options.glyph_name_prefix.empty()) {
+		prefix = sdsnew(options.glyph_name_prefix.c_str());
 	} else {
 		prefix = sdsempty();
 	}
@@ -151,7 +151,7 @@ static otfcc_GlyphOrder *createGlyphOrder(otfcc_Font *font, const otfcc_Options 
 	// pass 1: Map to existing glyph names
 	for (glyphid_t j = 0; j < numGlyphs; j++) {
 		glyf_Glyph *g = font->glyf->items[j];
-		if (options->name_glyphs_by_hash) { // name by hash
+		if (options.name_glyphs_by_hash) { // name by hash
 			GlyphHash h = nameGlyphByHash(g, font->glyf);
 			sds gname = sdsempty();
 			for (uint16_t j = 0; j < SHA1_BLOCK_SIZE; j++) {
@@ -181,7 +181,7 @@ static otfcc_GlyphOrder *createGlyphOrder(otfcc_Font *font, const otfcc_Options 
 				if (g->name) sdsfree(g->name);
 				g->name = sdsdup(sharedName);
 			}
-		} else if (options->ignore_glyph_order || options->name_glyphs_by_gid) {
+		} else if (options.ignore_glyph_order || options.name_glyphs_by_gid) {
 			// ignore built-in names
 			// pass
 		} else if (g->name) {
@@ -193,8 +193,8 @@ static otfcc_GlyphOrder *createGlyphOrder(otfcc_Font *font, const otfcc_Options 
 	}
 
 	// pass 2: Map to `post` names
-	if (font->post != NULL && font->post->post_name_map != NULL && !options->ignore_glyph_order &&
-	    !options->name_glyphs_by_gid) {
+	if (font->post != NULL && font->post->post_name_map != NULL && !options.ignore_glyph_order &&
+	    !options.name_glyphs_by_gid) {
 		otfcc_GlyphOrderEntry *s, *tmp;
 		HASH_ITER(hhID, font->post->post_name_map->byGID, s, tmp) {
 			sds gname = sdscatprintf(sdsempty(), "%s%s", prefix, s->name);
@@ -203,7 +203,7 @@ static otfcc_GlyphOrder *createGlyphOrder(otfcc_Font *font, const otfcc_Options 
 	}
 
 	// pass 3: Map to AGLFN & Unicode
-	if (font->cmap && !options->name_glyphs_by_gid) {
+	if (font->cmap && !options.name_glyphs_by_gid) {
 		otfcc_GlyphOrder *aglfn = GlyphOrder.create();
 		aglfn_setupNames(aglfn);
 
@@ -383,7 +383,7 @@ static void mergeLTSH(otfcc_Font *font) {
 	}
 }
 
-void otfcc_unconsolidateFont(otfcc_Font *font, const otfcc_Options *options) {
+void otfcc_unconsolidateFont(otfcc_Font *font, const otfcc::options_t &options) {
 	// Merge metrics
 	mergeHmtx(font);
 	mergeVmtx(font);

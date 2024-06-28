@@ -1,5 +1,7 @@
 #include "VORG.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 
 static INLINE void disposeVORG(table_VORG *vorg) {
@@ -8,7 +10,7 @@ static INLINE void disposeVORG(table_VORG *vorg) {
 
 caryll_standardRefType(table_VORG, table_iVORG, disposeVORG);
 
-table_VORG *otfcc_readVORG(const otfcc_Packet packet, const otfcc_Options *options) {
+table_VORG *otfcc_readVORG(const otfcc_Packet packet, const otfcc::options_t &options) {
 	FOR_TABLE('VORG', table) {
 		font_file_pointer data = table.data;
 		uint32_t length = table.length;
@@ -28,12 +30,12 @@ table_VORG *otfcc_readVORG(const otfcc_Packet packet, const otfcc_Options *optio
 		}
 		return vorg;
 	VORG_CORRUPTED:
-		logWarning("Table 'VORG' corrupted.");
+		logWarning(_("Table 'VORG' corrupted."));
 	}
 	return NULL;
 }
 
-caryll_Buffer *otfcc_buildVORG(const table_VORG *table, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildVORG(const table_VORG *table, const otfcc::options_t &options) {
 	if (!table) return NULL;
 	caryll_Buffer *buf = bufnew();
 	bufwrite16b(buf, 1);

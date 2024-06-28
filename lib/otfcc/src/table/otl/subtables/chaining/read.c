@@ -1,6 +1,8 @@
 #include "../chaining.h"
 #include "common.h"
 
+#include <intl.hpp>
+
 typedef struct {
 	otl_ClassDef *bc;
 	otl_ClassDef *ic;
@@ -223,7 +225,7 @@ FAIL:
 }
 otl_Subtable *otl_read_contextual(const font_file_pointer data, uint32_t tableLength,
                                   uint32_t offset, const glyphid_t maxGlyphs,
-                                  const otfcc_Options *options) {
+                                  const otfcc::options_t &options) {
 	uint16_t format = 0;
 	subtable_chaining *subtable = iSubtable_chaining.create();
 	subtable->type = otl_chaining_poly;
@@ -245,7 +247,7 @@ otl_Subtable *otl_read_contextual(const font_file_pointer data, uint32_t tableLe
 		return (otl_Subtable *)subtable;
 	}
 FAIL:
-	logWarning("Unsupported format %d.\n", format);
+	logWarning(_("Unsupported format {}."), format);
 	iSubtable_chaining.free(subtable);
 	return NULL;
 }
@@ -413,7 +415,7 @@ FAIL:
 	return NULL;
 }
 otl_Subtable *otl_read_chaining(const font_file_pointer data, uint32_t tableLength, uint32_t offset,
-                                const glyphid_t maxGlyphs, const otfcc_Options *options) {
+                                const glyphid_t maxGlyphs, const otfcc::options_t &options) {
 	uint16_t format = 0;
 	subtable_chaining *subtable = iSubtable_chaining.create();
 	subtable->type = otl_chaining_poly;
@@ -434,7 +436,7 @@ otl_Subtable *otl_read_chaining(const font_file_pointer data, uint32_t tableLeng
 		return (otl_Subtable *)subtable;
 	}
 FAIL:
-	logWarning("Unsupported format %d.\n", format);
+	logWarning(_("Unsupported format {}."), format);
 	iSubtable_chaining.free(subtable);
 	return NULL;
 }

@@ -26,7 +26,7 @@ static INLINE bool isValidGID(uint16_t gid, uint32_t tagIndex) {
 	}
 }
 
-table_TSI *otfcc_readTSI(const otfcc_Packet packet, const otfcc_Options *options, uint32_t tagIndex,
+table_TSI *otfcc_readTSI(const otfcc_Packet packet, const otfcc::options_t &options, uint32_t tagIndex,
                          uint32_t tagText) {
 	otfcc_PacketPiece textPart;
 	textPart.tag = 0;
@@ -83,10 +83,10 @@ table_TSI *otfcc_readTSI(const otfcc_Packet packet, const otfcc_Options *options
 	return tsi;
 }
 
-void otfcc_dumpTSI(const table_TSI *tsi, json_value *root, const otfcc_Options *options,
+void otfcc_dumpTSI(const table_TSI *tsi, json_value *root, const otfcc::options_t &options,
                    const char *tag) {
 	if (!tsi) return;
-	loggedStep("%s", tag) {
+	loggedStep(tag) {
 		json_value *_tsi = json_object_new(2);
 		json_value *_glyphs = json_object_new(tsi->length);
 		foreach (tsi_Entry *entry, *tsi) {
@@ -125,11 +125,11 @@ void otfcc_dumpTSI(const table_TSI *tsi, json_value *root, const otfcc_Options *
 	}
 }
 
-table_TSI *otfcc_parseTSI(const json_value *root, const otfcc_Options *options, const char *tag) {
+table_TSI *otfcc_parseTSI(const json_value *root, const otfcc::options_t &options, const char *tag) {
 	json_value *_tsi = NULL;
 	if (!(_tsi = json_obj_get_type(root, tag, json_object))) return NULL;
 	table_TSI *tsi = table_iTSI.create();
-	loggedStep("%s", tag) {
+	loggedStep(tag) {
 		json_value *_glyphs = json_obj_get_type(_tsi, "glyphs", json_object);
 		if (_glyphs) {
 			for (uint32_t j = 0; j < _glyphs->u.object.length; j++) {
@@ -214,7 +214,7 @@ static void pushTSIEntries(tsi_BuildTarget *target, const table_TSI *tsi, const 
 	}
 }
 
-tsi_BuildTarget otfcc_buildTSI(const table_TSI *tsi, const otfcc_Options *options) {
+tsi_BuildTarget otfcc_buildTSI(const table_TSI *tsi, const otfcc::options_t &options) {
 
 	tsi_BuildTarget target;
 	if (!tsi) {

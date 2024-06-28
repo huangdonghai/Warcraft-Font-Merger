@@ -22,7 +22,7 @@ caryll_standardVectorImpl(subtable_gsub_single, otl_GsubSingleEntry, gss_typeinf
 
 otl_Subtable *otl_read_gsub_single(const font_file_pointer data, uint32_t tableLength,
                                    uint32_t subtableOffset, const glyphid_t maxGlyphs,
-                                   const otfcc_Options *options) {
+                                   const otfcc::options_t &options) {
 	subtable_gsub_single *subtable = iSubtable_gsub_single.create();
 	otl_Coverage *from = NULL;
 	otl_Coverage *to = NULL;
@@ -82,7 +82,7 @@ json_value *otl_gsub_dump_single(const otl_Subtable *_subtable) {
 	return st;
 }
 
-otl_Subtable *otl_gsub_parse_single(const json_value *_subtable, const otfcc_Options *options) {
+otl_Subtable *otl_gsub_parse_single(const json_value *_subtable, const otfcc::options_t &options) {
 	subtable_gsub_single *subtable = iSubtable_gsub_single.create();
 	for (glyphid_t j = 0; j < _subtable->u.object.length; j++) {
 		if (_subtable->u.object.values[j].value &&

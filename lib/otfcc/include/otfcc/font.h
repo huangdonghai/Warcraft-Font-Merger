@@ -95,7 +95,7 @@ struct _caryll_font {
 
 extern caryll_ElementInterfaceOf(otfcc_Font) {
 	caryll_RT(otfcc_Font);
-	void (*consolidate)(otfcc_Font * font, const otfcc_Options *options);
+	void (*consolidate)(otfcc_Font * font, const otfcc::options_t &options);
 	void *(*createTable)(otfcc_Font * font, const uint32_t tag);
 	void (*deleteTable)(otfcc_Font * font, const uint32_t tag);
 }
@@ -103,7 +103,7 @@ otfcc_iFont;
 
 // Font builder interfaces
 typedef struct otfcc_IFontBuilder {
-	otfcc_Font *(*read)(void *source, uint32_t index, const otfcc_Options *options);
+	otfcc_Font *(*read)(void *source, uint32_t index, const otfcc::options_t &options);
 	void (*free)(struct otfcc_IFontBuilder *self);
 } otfcc_IFontBuilder;
 otfcc_IFontBuilder *otfcc_newOTFReader();
@@ -111,7 +111,7 @@ otfcc_IFontBuilder *otfcc_newJsonReader();
 
 // Font serializer interface
 typedef struct otfcc_IFontSerializer {
-	void *(*serialize)(otfcc_Font *font, const otfcc_Options *options);
+	void *(*serialize)(otfcc_Font *font, const otfcc::options_t &options);
 	void (*free)(struct otfcc_IFontSerializer *self);
 } otfcc_IFontSerializer;
 otfcc_IFontSerializer *otfcc_newJsonWriter();

@@ -18,7 +18,7 @@ caryll_standardValType(svg_Assignment, svg_iAssignment, initSVGAssigment, copySV
                        disposeSVGAssignment);
 caryll_standardVectorImpl(table_SVG, svg_Assignment, svg_iAssignment, table_iSVG);
 
-table_SVG *otfcc_readSVG(const otfcc_Packet packet, const otfcc_Options *options) {
+table_SVG *otfcc_readSVG(const otfcc_Packet packet, const otfcc::options_t &options) {
 	table_SVG *svg = NULL;
 	FOR_TABLE('SVG ', table) {
 		if (table.length < 10) goto FAIL;
@@ -59,7 +59,7 @@ static bool canUsePlainFormat(const caryll_Buffer *buf) {
 	       || (buf->size > 5 && buf->data[0] == '<' && buf->data[1] == '?' && buf->data[2] == 'x' &&
 	           buf->data[3] == 'm' && buf->data[4] == 'l');
 }
-void otfcc_dumpSVG(const table_SVG *svg, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpSVG(const table_SVG *svg, json_value *root, const otfcc::options_t &options) {
 	if (!svg) return;
 	loggedStep("SVG ") {
 		json_value *_svg = json_array_new(svg->length);
@@ -86,7 +86,7 @@ void otfcc_dumpSVG(const table_SVG *svg, json_value *root, const otfcc_Options *
 	}
 }
 
-table_SVG *otfcc_parseSVG(const json_value *root, const otfcc_Options *options) {
+table_SVG *otfcc_parseSVG(const json_value *root, const otfcc::options_t &options) {
 	json_value *_svg = NULL;
 	if (!(_svg = json_obj_get_type(root, "SVG_", json_array))) return NULL;
 	table_SVG *svg = table_iSVG.create();
@@ -123,7 +123,7 @@ static int byStartGID(const svg_Assignment *a, const svg_Assignment *b) {
 	return a->start - b->start;
 }
 
-caryll_Buffer *otfcc_buildSVG(const table_SVG *_svg, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildSVG(const table_SVG *_svg, const otfcc::options_t &options) {
 	if (!_svg || !_svg->length) return NULL;
 
 	// sort assignments

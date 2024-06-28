@@ -393,7 +393,7 @@ static cff_IOutlineBuilder drawPass = {.setWidth = callback_draw_setwidth,
                                        .setMask = callback_draw_setmask,
                                        .getrand = callback_draw_getrand};
 
-static void buildOutline(glyphid_t i, cff_extract_context *context, const otfcc_Options *options) {
+static void buildOutline(glyphid_t i, cff_extract_context *context, const otfcc::options_t &options) {
 	cff_File *f = context->cffFile;
 	glyf_Glyph *g = otfcc_newGlyf_glyph();
 	context->glyphs->items[i] = g;
@@ -604,7 +604,7 @@ static void applyCffMatrix(table_CFF *CFF_, table_glyf *glyf, const table_head *
 	}
 }
 
-table_CFFAndGlyf otfcc_readCFFAndGlyfTables(const otfcc_Packet packet, const otfcc_Options *options,
+table_CFFAndGlyf otfcc_readCFFAndGlyfTables(const otfcc_Packet packet, const otfcc::options_t &options,
                                             const table_head *head) {
 	table_CFFAndGlyf ret;
 	ret.meta = NULL;
@@ -772,7 +772,7 @@ static json_value *fdToJson(const table_CFF *table) {
 	return _CFF_;
 }
 
-void otfcc_dumpCFF(const table_CFF *table, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpCFF(const table_CFF *table, json_value *root, const otfcc::options_t &options) {
 	if (!table) return;
 	loggedStep("CFF") {
 		json_object_push(root, "CFF_", fdToJson(table));
@@ -814,7 +814,7 @@ static cff_PrivateDict *pdFromJson(json_value *dump) {
 
 	return pd;
 }
-static table_CFF *fdFromJson(const json_value *dump, const otfcc_Options *options, bool topLevel) {
+static table_CFF *fdFromJson(const json_value *dump, const otfcc::options_t &options, bool topLevel) {
 	table_CFF *table = table_iCFF.create();
 	if (!dump || dump->type != json_object) return table;
 	// Names
@@ -880,7 +880,7 @@ static table_CFF *fdFromJson(const json_value *dump, const otfcc_Options *option
 	if (!table->fontName) table->fontName = sdsnew("CARYLL_CFFFONT");
 	if (!table->privateDict) table->privateDict = otfcc_newCff_private();
 	// Deal with force-cid
-	if (topLevel && options->force_cid && !table->fdArray) {
+	if (topLevel && options.force_cid && !table->fdArray) {
 		table->fdArrayCount = 1;
 		NEW(table->fdArray, table->fdArrayCount);
 		table->fdArray[0] = table_iCFF.create();
@@ -894,7 +894,7 @@ static table_CFF *fdFromJson(const json_value *dump, const otfcc_Options *option
 	if (table->isCID && !table->cidOrdering) { table->cidOrdering = sdsnew("OTFCCAUTOCID"); }
 	return table;
 }
-table_CFF *otfcc_parseCFF(const json_value *root, const otfcc_Options *options) {
+table_CFF *otfcc_parseCFF(const json_value *root, const otfcc::options_t &options) {
 	json_value *dump = json_obj_get_type(root, "CFF_", json_object);
 	if (!dump) {
 		return NULL;
@@ -911,7 +911,7 @@ typedef struct {
 	table_glyf *glyf;
 	uint16_t defaultWidth;
 	uint16_t nominalWidthX;
-	const otfcc_Options *options;
+	const otfcc::options_t *options;
 	cff_SubrGraph graph;
 } cff_charstring_builder_context;
 typedef struct {
@@ -925,12 +925,12 @@ static void cff_make_charstrings(cff_charstring_builder_context *context, caryll
 	for (glyphid_t j = 0; j < context->glyf->length; j++) {
 		cff_CharstringIL *il = cff_compileGlyphToIL(context->glyf->items[j], context->defaultWidth,
 		                                            context->nominalWidthX);
-		cff_optimizeIL(il, context->options);
+		cff_optimizeIL(il, *context->options);
 		cff_insertILToGraph(&context->graph, il);
 		FREE(il->instr);
 		FREE(il);
 	}
-	cff_ilGraphToBuffers(&context->graph, s, gs, ls, context->options);
+	cff_ilGraphToBuffers(&context->graph, s, gs, ls, *context->options);
 }
 
 // String table management
@@ -1232,7 +1232,7 @@ static cff_Index *cff_make_fdarray(tableid_t fdArrayCount, table_CFF **fdArray,
 }
 
 static caryll_Buffer *writecff_CIDKeyed(table_CFF *cff, table_glyf *glyf,
-                                        const otfcc_Options *options) {
+                                        const otfcc::options_t &options) {
 	caryll_Buffer *blob = bufnew();
 	// The Strings hashtable
 	cff_sid_entry *stringHash = NULL;
@@ -1281,9 +1281,9 @@ static caryll_Buffer *writecff_CIDKeyed(table_CFF *cff, table_glyf *glyf,
 		g2cContext.glyf = glyf;
 		g2cContext.defaultWidth = cff->privateDict->defaultWidthX;
 		g2cContext.nominalWidthX = cff->privateDict->nominalWidthX;
-		g2cContext.options = options;
+		g2cContext.options = &options;
 		cff_iSubrGraph.init(&g2cContext.graph);
-		g2cContext.graph.doSubroutinize = options->cff_doSubroutinize;
+		g2cContext.graph.doSubroutinize = options.cff_doSubroutinize;
 
 		cff_make_charstrings(&g2cContext, &s, &gs, &ls);
 
@@ -1406,6 +1406,6 @@ static caryll_Buffer *writecff_CIDKeyed(table_CFF *cff, table_glyf *glyf,
 	return blob;
 }
 
-caryll_Buffer *otfcc_buildCFF(const table_CFFAndGlyf cffAndGlyf, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildCFF(const table_CFFAndGlyf cffAndGlyf, const otfcc::options_t &options) {
 	return writecff_CIDKeyed(cffAndGlyf.meta, cffAndGlyf.glyphs, options);
 }

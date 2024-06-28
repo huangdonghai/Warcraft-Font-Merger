@@ -1,5 +1,7 @@
 #include "mark.h"
 
+#include <intl.hpp>
+
 typedef struct {
 	int gid;
 	sds name;
@@ -30,12 +32,12 @@ static int lig_by_gid(lig_hash *a, lig_hash *b) {
 	return a->gid - b->gid;
 }
 
-static void consolidateMarkArray(otfcc_Font *font, table_OTL *table, const otfcc_Options *options,
+static void consolidateMarkArray(otfcc_Font *font, table_OTL *table, const otfcc::options_t &options,
                                  otl_MarkArray *markArray, glyphclass_t classCount) {
 	mark_hash *hm = NULL;
 	for (glyphid_t k = 0; k < markArray->length; k++) {
 		if (!GlyphOrder.consolidateHandle(font->glyph_order, &markArray->items[k].glyph)) {
-			logWarning("[Consolidate] Ignored unknown glyph name %s.",
+			logWarning(_("[Consolidate] Ignored unknown glyph name {}."),
 			           markArray->items[k].glyph.name);
 			continue;
 		}
@@ -51,8 +53,9 @@ static void consolidateMarkArray(otfcc_Font *font, table_OTL *table, const otfcc
 			s->anchor = markArray->items[k].anchor;
 			HASH_ADD_INT(hm, gid, s);
 		} else {
-			logWarning("[Consolidate] Ignored invalid or double-mapping mark definition for /%s.",
-			           markArray->items[k].glyph.name);
+			logWarning(
+			    _("[Consolidate] Ignored invalid or double-mapping mark definition for /{}."),
+			    markArray->items[k].glyph.name);
 		}
 	}
 	HASH_SORT(hm, mark_by_gid);
@@ -70,13 +73,13 @@ static void consolidateMarkArray(otfcc_Font *font, table_OTL *table, const otfcc
 	}
 }
 
-static void consolidateBaseArray(otfcc_Font *font, table_OTL *table, const otfcc_Options *options,
+static void consolidateBaseArray(otfcc_Font *font, table_OTL *table, const otfcc::options_t &options,
                                  otl_BaseArray *baseArray) {
 	// consolidate bases
 	base_hash *hm = NULL;
 	for (glyphid_t k = 0; k < baseArray->length; k++) {
 		if (!GlyphOrder.consolidateHandle(font->glyph_order, &baseArray->items[k].glyph)) {
-			logWarning("[Consolidate] Ignored unknown glyph name %s.",
+			logWarning(_("[Consolidate] Ignored unknown glyph name {}."),
 			           baseArray->items[k].glyph.name);
 			continue;
 		}
@@ -91,7 +94,7 @@ static void consolidateBaseArray(otfcc_Font *font, table_OTL *table, const otfcc
 			baseArray->items[k].anchors = NULL; // Transfer ownership
 			HASH_ADD_INT(hm, gid, s);
 		} else {
-			logWarning("[Consolidate] Ignored anchor double-definition for /%s.",
+			logWarning(_("[Consolidate] Ignored anchor double-definition for /{}."),
 			           baseArray->items[k].glyph.name);
 		}
 	}
@@ -109,12 +112,12 @@ static void consolidateBaseArray(otfcc_Font *font, table_OTL *table, const otfcc
 	}
 }
 
-static void consolidateLigArray(otfcc_Font *font, table_OTL *table, const otfcc_Options *options,
+static void consolidateLigArray(otfcc_Font *font, table_OTL *table, const otfcc::options_t &options,
                                 otl_LigatureArray *ligArray) {
 	lig_hash *hm = NULL;
 	for (glyphid_t k = 0; k < ligArray->length; k++) {
 		if (!GlyphOrder.consolidateHandle(font->glyph_order, &ligArray->items[k].glyph)) {
-			logWarning("[Consolidate] Ignored unknown glyph name %s.",
+			logWarning(_("[Consolidate] Ignored unknown glyph name {}."),
 			           ligArray->items[k].glyph.name);
 			continue;
 		}
@@ -130,7 +133,7 @@ static void consolidateLigArray(otfcc_Font *font, table_OTL *table, const otfcc_
 			ligArray->items[k].anchors = NULL;
 			HASH_ADD_INT(hm, gid, s);
 		} else {
-			logWarning("[Consolidate] Ignored anchor double-definition for /%s.",
+			logWarning(_("[Consolidate] Ignored anchor double-definition for /{}."),
 			           ligArray->items[k].glyph.name);
 		}
 	}
@@ -150,7 +153,7 @@ static void consolidateLigArray(otfcc_Font *font, table_OTL *table, const otfcc_
 }
 
 bool consolidate_mark_to_single(otfcc_Font *font, table_OTL *table, otl_Subtable *_subtable,
-                                const otfcc_Options *options) {
+                                const otfcc::options_t &options) {
 	subtable_gpos_markToSingle *subtable = &(_subtable->gpos_markToSingle);
 	consolidateMarkArray(font, table, options, &subtable->markArray, subtable->classCount);
 	consolidateBaseArray(font, table, options, &subtable->baseArray);
@@ -158,7 +161,7 @@ bool consolidate_mark_to_single(otfcc_Font *font, table_OTL *table, otl_Subtable
 }
 
 bool consolidate_mark_to_ligature(otfcc_Font *font, table_OTL *table, otl_Subtable *_subtable,
-                                  const otfcc_Options *options) {
+                                  const otfcc::options_t &options) {
 	subtable_gpos_markToLigature *subtable = &(_subtable->gpos_markToLigature);
 	consolidateMarkArray(font, table, options, &subtable->markArray, subtable->classCount);
 	consolidateLigArray(font, table, options, &subtable->ligArray);

@@ -6,7 +6,7 @@ static INLINE bool isStringTag(uint32_t tag) {
 	return tag == 'dlng' || tag == 'slng';
 }
 
-void otfcc_dumpMeta(const table_meta *meta, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpMeta(const table_meta *meta, json_value *root, const otfcc::options_t &options) {
 	if (!meta) return;
 	loggedStep("meta") {
 		json_value *_meta = json_object_new(3);

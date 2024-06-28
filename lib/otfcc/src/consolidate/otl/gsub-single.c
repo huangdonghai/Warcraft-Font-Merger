@@ -1,5 +1,7 @@
 #include "gsub-single.h"
 
+#include <intl.hpp>
+
 typedef struct {
 	int fromid;
 	sds fromname;
@@ -11,23 +13,23 @@ static int by_from_id(gsub_single_map_hash *a, gsub_single_map_hash *b) {
 	return a->fromid - b->fromid;
 }
 bool consolidate_gsub_single(otfcc_Font *font, table_OTL *table, otl_Subtable *_subtable,
-                             const otfcc_Options *options) {
+                             const otfcc::options_t &options) {
 	subtable_gsub_single *subtable = &(_subtable->gsub_single);
 	gsub_single_map_hash *h = NULL;
 	for (size_t k = 0; k < subtable->length; k++) {
 		if (!GlyphOrder.consolidateHandle(font->glyph_order, &subtable->items[k].from)) {
-			logWarning("[Consolidate] Ignored missing glyph /%s.\n", subtable->items[k].from.name);
+			logWarning(_("[Consolidate] Ignored missing glyph /{}."), subtable->items[k].from.name);
 			continue;
 		}
 		if (!GlyphOrder.consolidateHandle(font->glyph_order, &subtable->items[k].to)) {
-			logWarning("[Consolidate] Ignored missing glyph /%s.\n", subtable->items[k].to.name);
+			logWarning(_("[Consolidate] Ignored missing glyph /{}."), subtable->items[k].to.name);
 			continue;
 		}
 		gsub_single_map_hash *s;
 		int fromid = subtable->items[k].from.index;
 		HASH_FIND_INT(h, &fromid, s);
 		if (s) {
-			logWarning("[Consolidate] Double-mapping a glyph in a single substitution /%s.\n",
+			logWarning(_("[Consolidate] Double-mapping a glyph in a single substitution /{}."),
 			           subtable->items[k].from.name);
 		} else {
 			NEW(s);
@@ -39,7 +41,9 @@ bool consolidate_gsub_single(otfcc_Font *font, table_OTL *table, otl_Subtable *_
 		}
 	}
 	HASH_SORT(h, by_from_id);
-	if (HASH_COUNT(h) != subtable->length) { logWarning("[Consolidate] In this lookup, some mappings are ignored.\n"); }
+	if (HASH_COUNT(h) != subtable->length) {
+		logWarning(_("[Consolidate] In this lookup, some mappings are ignored."));
+	}
 
 	iSubtable_gsub_single.clear(subtable);
 	gsub_single_map_hash *s, *tmp;

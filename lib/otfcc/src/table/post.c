@@ -17,7 +17,7 @@ static INLINE void disposePost(MOVE table_post *post) {
 
 caryll_standardRefType(table_post, iTable_post, initPost, disposePost);
 
-table_post *otfcc_readPost(const otfcc_Packet packet, const otfcc_Options *options) {
+table_post *otfcc_readPost(const otfcc_Packet packet, const otfcc::options_t &options) {
 	FOR_TABLE('post', table) {
 		font_file_pointer data = table.data;
 
@@ -71,7 +71,7 @@ table_post *otfcc_readPost(const otfcc_Packet packet, const otfcc_Options *optio
 	return NULL;
 }
 
-void otfcc_dumpPost(const table_post *table, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpPost(const table_post *table, json_value *root, const otfcc::options_t &options) {
 	if (!table) return;
 	loggedStep("post") {
 		json_value *post = json_object_new(10);
@@ -88,12 +88,12 @@ void otfcc_dumpPost(const table_post *table, json_value *root, const otfcc_Optio
 		json_object_push(root, "post", post);
 	}
 }
-table_post *otfcc_parsePost(const json_value *root, const otfcc_Options *options) {
+table_post *otfcc_parsePost(const json_value *root, const otfcc::options_t &options) {
 	table_post *post = iTable_post.create();
 	json_value *table = NULL;
 	if ((table = json_obj_get_type(root, "post", json_object))) {
 		loggedStep("post") {
-			if (options->short_post) {
+			if (options.short_post) {
 				post->version = 0x30000;
 			} else {
 				post->version = otfcc_to_fixed(json_obj_getnum(table, "version"));
@@ -111,7 +111,7 @@ table_post *otfcc_parsePost(const json_value *root, const otfcc_Options *options
 	return post;
 }
 caryll_Buffer *otfcc_buildPost(const table_post *post, otfcc_GlyphOrder *glyphorder,
-                               const otfcc_Options *options) {
+                               const otfcc::options_t &options) {
 	if (!post) return NULL;
 	caryll_Buffer *buf = bufnew();
 	bufwrite32b(buf, post->version);

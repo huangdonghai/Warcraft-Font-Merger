@@ -50,6 +50,6 @@ extern caryll_RefElementInterface(cff_SubrGraph) cff_iSubrGraph;
 
 void cff_insertILToGraph(cff_SubrGraph *g, cff_CharstringIL *il);
 void cff_ilGraphToBuffers(cff_SubrGraph *g, caryll_Buffer **s, caryll_Buffer **gs, caryll_Buffer **ls,
-                          const otfcc_Options *options);
+                          const otfcc::options_t &options);
 
 #endif

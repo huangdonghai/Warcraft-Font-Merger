@@ -8,12 +8,223 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Add a prefix to the glyph names."
+msgstr "为字形名称添加前缀。"
+
+#, c++-format
+msgid "Anchored reference to {} does not match its X/Y offset data."
+msgstr ""
+
+msgid "Axes number in GVAR and FVAR are inequal"
+msgstr ""
+
+msgid "Be silent when building."
+msgstr "在构建时保持静默。"
+
+msgid "Begin"
+msgstr "开始"
+
+#, c++-format
+msgid "Building lookup {0} ({1}/{2})"
+msgstr ""
+
+#, c++-format
+msgid "Cannot parse JSON file \"{}\" as a font. Exit."
+msgstr "无法将 JSON 文件 \"{}\" 解析为字体。退出。"
+
+#, c++-format
+msgid "Cannot parse JSON file \"{}\". Exit."
+msgstr "无法解析 JSON 文件 \"{}\"。退出。"
+
+#, c++-format
+msgid "Cannot read JSON file \"{}\". Exit."
+msgstr "无法读取 JSON 文件 \"{}\"。退出。"
+
+#, c++-format
+msgid "Cannot read SFNT file \"{}\". Exit."
+msgstr "无法读取 SFNT 文件 \"{}\"。退出。"
+
+#, c++-format
+msgid "Cannot write to file \"{}\". Exit."
+msgstr "无法写入文件 \"{}\"。退出。"
+
+msgid "Convert name-keyed CFF OTF into CID-keyed."
+msgstr "将基于名称的 CFF OTF 转换为基于 CID 的。"
+
+msgid ""
+"Create a stub `cmap` format 4 subtable if format 12 subtable is present."
+msgstr ""
+"如果已经存在第 12 格式的 `cmap` 子表，则第 4 格式的子表只创建一个占位符。"
+
+msgid "Default optimization."
+msgstr ""
+
+msgid "Display this help message and exit."
+msgstr "显示帮助信息并退出。"
+
+msgid "Display version information and exit."
+msgstr "显示版本信息并退出。"
+
+msgid "Do not export glyph order information."
+msgstr "不导出字形顺序信息。"
+
+msgid "Do not export hinting information."
+msgstr "不导出字形微调信息。"
+
+msgid "Don't export glyph names in the result font."
+msgstr "生成的字体中不导出字形名称。"
+
+msgid "Export 'cmap' keys as decimal number."
+msgstr "以十进制形式导出 'cmap' 键。"
+
+msgid "Export 'cmap' keys as hex number (U+FFFF)."
+msgstr "以十六进制形式 (U+FFFF) 导出 'cmap' 键。"
+
+#, c++-format
+msgid "Failed to access point {0} in reference to {1}."
+msgstr ""
+
+#, c++-format
+msgid "Failed to access point {} in outer glyph."
+msgstr ""
+
 #, c++-format
 msgid "Failed to load file {0}"
 msgstr "读取文件 {0} 失败"
 
+msgid "Finish"
+msgstr "完成"
+
+#, c++-format
+msgid "Font structure broken or corrupted \"{}\". Exit."
+msgstr ""
+
+msgid "Force uglify the output JSON."
+msgstr "强制压缩输出 JSON。"
+
+msgid ""
+"Found circular reference of out-of-range point reference in anchored "
+"reference."
+msgstr ""
+
+#, c++-format
+msgid "From file {}"
+msgstr ""
+
+msgid "Ignore the glyph order information in the input."
+msgstr "忽略输入的字形顺序信息。"
+
+msgid "Ignore the hinting information in the input."
+msgstr "忽略输入的字形微调信息。"
+
+msgid ""
+"Include an empty DSIG table in the font. For some Microsoft applications, "
+"DSIG is required to enable OpenType features."
+msgstr ""
+
+msgid "Keep duplicate OpenType feature definitions."
+msgstr ""
+
+msgid "Keep duplicate OpenType lookups."
+msgstr ""
+
+msgid "Keep the OS/2.ulUnicodeRange[1-4] as-is."
+msgstr ""
+
+msgid ""
+"Keep the OS/2.xAvgCharWidth value from the input instead of stating the "
+"average width of glyphs. Useful when creating a monospaced font."
+msgstr ""
+
+msgid ""
+"Keep the glyph order information in the input. Use to preserve glyph order "
+"under -O2 and -O3."
+msgstr ""
+
+msgid "Keep the head.modified time in the json, instead of using current time."
+msgstr ""
+
+#, c++-format
+msgid "Lookup assignment {0} for feature [{1}/{2}] is missing or invalid."
+msgstr ""
+
+#, c++-format
+msgid "Lookup {} already exists."
+msgstr ""
+
+#, c++-format
+msgid "Lookup {} does not have a valid 'type' field."
+msgstr ""
+
+#, c++-format
+msgid "Lookup {} does not have a valid subtable list."
+msgstr ""
+
+#, c++-format
+msgid "Lookup {} does not have any subtables."
+msgstr ""
+
+#, c++-format
+msgid "Lookup {} is empty."
+msgstr ""
+
+msgid "Merge duplicate OpenType feature definitions."
+msgstr ""
+
+msgid "Merge duplicate OpenType lookups."
+msgstr ""
+
+#, c++-format
+msgid "Missing or invalid encodingID for name entry {}"
+msgstr ""
+
+#, c++-format
+msgid "Missing or invalid languageID for name entry {}"
+msgstr ""
+
+#, c++-format
+msgid "Missing or invalid name string for name entry {}"
+msgstr ""
+
+#, c++-format
+msgid "Missing or invalid nameID for name entry {}"
+msgstr ""
+
+#, c++-format
+msgid "Missing or invalid platformID for name entry {}"
+msgstr ""
+
+msgid ""
+"More aggressive optimizations for web font. In this level, the following "
+"options will be set:\n"
+msgstr ""
+
+msgid ""
+"Most aggressive opptimization strategy will be used. In this level, these "
+"options will be set:\n"
+msgstr ""
+
+msgid "Name glyphs using its glyph id."
+msgstr "使用字形编号命名字形。"
+
+msgid "Name glyphs using its hash value."
+msgstr "使用字形的散列值命名字形。"
+
+msgid "OpenType SVG table detected. Glyph order is preserved."
+msgstr ""
+
+#, c++-format
+msgid "OpenType table {}{}{}{} successfully built."
+msgstr ""
+
 msgid "Output otd file. If omit, override the first input otd file."
 msgstr "输出 otd 文件路径。如果不指定，则覆盖第一个输入 otd 文件。"
+
+msgid "Path to input file. When absent the input will be read from the STDIN."
+msgstr "输入文件路径。如果不指定，则从标准输入读取。"
+
+msgid "Prettify the output JSON."
+msgstr "美化输出 JSON。"
 
 msgid ""
 "Set font family and style, formatted as \"Font Name;Weight;Width;Slope\".\n"
@@ -95,6 +306,293 @@ msgstr ""
 "- Italic (Italized)\n"
 "- Oblique (Slant)\n"
 
-#, c-format
-msgid "Step time = %g s.\n"
-msgstr "步骤耗时 %g 秒。\n"
+msgid ""
+"Set output file path to <file>. When absent the dump will be written to "
+"STDOUT."
+msgstr "指定输出文件路径为 <file>。如果不指定，则输出到标准输出。"
+
+msgid "Set output file path to <output.(ttf|otf)>."
+msgstr ""
+
+msgid "Show more information when building."
+msgstr "在构建时显示更多信息。"
+
+#, c++-format
+msgid "Step time = {:g} s."
+msgstr "步骤耗时 {:g} 秒。"
+
+#, c++-format
+msgid "Subfont index {0} out of range for \"{1}\" (0 -- {2}). Exit."
+msgstr ""
+
+msgid "Subroutinize CFF table."
+msgstr ""
+
+msgid "Table 'BASE' Corrupted"
+msgstr ""
+
+msgid "Table 'COLR' corrupted."
+msgstr ""
+
+msgid "Table 'VDMX' corrupted."
+msgstr ""
+
+msgid "Table 'VORG' corrupted."
+msgstr ""
+
+msgid "Table 'hmtx' corrupted."
+msgstr ""
+
+msgid "Table 'meta' corrupted."
+msgstr ""
+
+msgid "Table 'vhea' corrupted."
+msgstr ""
+
+msgid "Table 'vmtx' corrupted."
+msgstr ""
+
+#, c++-format
+msgid "This is WFM otfccbuild, version {}.{}.{}."
+msgstr "WFM otfccbuild，版本 {}.{}.{}。"
+
+#, c++-format
+msgid "This is WFM otfccdump, version {}.{}.{}."
+msgstr "WFM otfccdump，版本 {}.{}.{}。"
+
+msgid "Turn off any optimization."
+msgstr ""
+
+#, c++-format
+msgid "U+{0:04X} is already mapped to {1}. Assignment to {2} is ignored."
+msgstr ""
+
+#, c++-format
+msgid ""
+"UVS U+{0:04X} U+{1:04X} is already mapped to {2}. Assignment to {3} is "
+"ignored."
+msgstr ""
+
+#, c++-format
+msgid ""
+"Unknown operator {} occurs in Type 2 CharString. It may caused by file "
+"corruption."
+msgstr ""
+
+#, c++-format
+msgid "Unsupported format {}."
+msgstr ""
+
+msgid "Use the <n>th subfont within the input font."
+msgstr "在输入字体中使用第 <n> 个子字体。"
+
+#, c++-format
+msgid "[Consolidate] CID Subfont {0} is not defined. (in glyph /{1})."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] COLR decomposition for /{} is empty"
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Detected caret value double-mapping about glyph {}"
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Detected glyph double-mapping about /{}."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Double-mapping a glyph in a cursive positioning /{}."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Double-mapping a glyph in a reverse substitution /{}."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Double-mapping a glyph in a single substitution /{}."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Glyph name {} is already in use."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Glyph {0} is renamed into {1}."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[Consolidate] Ignored UVS mapping [U+{0:04X} U+{1:04X}] to non-existent "
+"glyph /{2}."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[Consolidate] Ignored absent glyph component reference /{0} within /{1}."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Ignored anchor double-definition for /{}."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Ignored empty subtable {0} of lookup {1}."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[Consolidate] Ignored invalid or double-mapping mark definition for /{}."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Ignored mapping U+{0:04X} to non-existent glyph /{1}."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Ignored missing glyph /{}."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Ignored missing glyph of /{}"
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Ignored unknown glyph name {}."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Ignoring empty ligature substitution to glyph /{}."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[Consolidate] Ignoring empty one-to-many / alternative substitution for "
+"glyph /{}."
+msgstr ""
+
+msgid "[Consolidate] Ignoring non-canonical chaining subtable."
+msgstr ""
+
+msgid "[Consolidate] In this lookup, some mappings are ignored."
+msgstr ""
+
+msgid ""
+"[Consolidate] In this reverse subsitution lookup, some mappings are ignored."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Lookup {} is empty and will be removed."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Quoting an invalid lookup #{}."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[Consolidate] Quoting an invalid lookup {}. This lookup application is "
+"ignored."
+msgstr ""
+
+#, c++-format
+msgid "[Consolidate] Removed empty contour #{0} in glyph {1}."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[OTFCC-fea] Duplicate feature for [{0}/{1}]. This feature will be ignored."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[OTFCC-fea] Duplicate language item [{0}/{1}]. This language term will be "
+"ignored."
+msgstr ""
+
+#, c++-format
+msgid "[OTFCC-fea] Ignoring invalid or unsupported lookup {}."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[OTFCC-fea] Invalid anchor class name <{0}> for /{1}. This base anchor is "
+"ignored."
+msgstr ""
+
+#, c++-format
+msgid "[OTFCC-fea] Merged duplicate {0} '{1}' into '{2}'."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[OTFCC-fea] There is no valid feature assignments for [{0}/{1}]. This "
+"language term will be ignored."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[OTFCC-fea] There is no valid lookup assignments for [{0}/{1}]. This feature "
+"will be ignored.)"
+msgstr ""
+
+#, c++-format
+msgid "[OTFCC-fea] Using extended OpenType table layout for {0}/{1}."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[Stat] Circular glyph reference found in gid {0} to gid {1}. The reference "
+"will be dropped."
+msgstr ""
+
+#, c++-format
+msgid "[libcff] Bad CFF font: ({0}, name), ({1}, top_dict)."
+msgstr ""
+
+msgid "[libcff] Bad CFF font: no any glyph data."
+msgstr ""
+
+#, c++-format
+msgid ""
+"[libcff] Stack cannot provide enough parameters for {0} {1:04x}. This "
+"operation is ignored."
+msgstr ""
+
+#, c++-format
+msgid "[libcff] Total {} subroutines extracted."
+msgstr ""
+
+msgid "glyf: SCALED_COMPONENT_OFFSET is not supported."
+msgstr ""
+
+msgid "table 'OS/2' corrupted."
+msgstr ""
+
+msgid "table 'cmap' corrupted."
+msgstr ""
+
+msgid "table 'fvar' corrupted."
+msgstr ""
+
+msgid "table 'gasp' corrupted."
+msgstr ""
+
+msgid "table 'glyf' corrupted."
+msgstr ""
+
+msgid "table 'head' corrupted."
+msgstr ""
+
+msgid "table 'hhea' corrupted."
+msgstr ""
+
+msgid "table 'loca' corrupted."
+msgstr ""
+
+msgid "table 'maxp' corrupted."
+msgstr ""
+
+msgid "table 'name' corrupted."
+msgstr ""

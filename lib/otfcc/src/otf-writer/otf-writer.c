@@ -4,7 +4,7 @@
 #include "otfcc/sfnt-builder.h"
 #include "stat.h"
 
-static void *serializeToOTF(otfcc_Font *font, const otfcc_Options *options) {
+static void *serializeToOTF(otfcc_Font *font, const otfcc::options_t &options) {
 	// do stat before serialize
 	otfcc_statFont(font, options);
 
@@ -79,7 +79,7 @@ static void *serializeToOTF(otfcc_Font *font, const otfcc_Options *options) {
 		                            otfcc_buildTSI5(font->TSI5, options, font->glyf->length));
 	}
 
-	if (options->dummy_DSIG) {
+	if (options.dummy_DSIG) {
 		caryll_Buffer *dsig = bufnew();
 		bufwrite32b(dsig, 0x00000001);
 		bufwrite16b(dsig, 0);

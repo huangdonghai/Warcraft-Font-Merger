@@ -1,5 +1,7 @@
 #include "gpos-single.h"
 
+#include <intl.hpp>
+
 typedef struct {
 	int fromid;
 	sds fromname;
@@ -11,12 +13,12 @@ static int gpos_by_from_id(gpos_single_hash *a, gpos_single_hash *b) {
 }
 
 bool consolidate_gpos_single(otfcc_Font *font, table_OTL *table, otl_Subtable *_subtable,
-                             const otfcc_Options *options) {
+                             const otfcc::options_t &options) {
 	subtable_gpos_single *subtable = &(_subtable->gpos_single);
 	gpos_single_hash *h = NULL;
 	for (glyphid_t k = 0; k < subtable->length; k++) {
 		if (!GlyphOrder.consolidateHandle(font->glyph_order, &subtable->items[k].target)) {
-			logWarning("[Consolidate] Ignored missing glyph /%s.\n",
+			logWarning(_("[Consolidate] Ignored missing glyph /{}."),
 			           subtable->items[k].target.name);
 			continue;
 		}
@@ -24,7 +26,7 @@ bool consolidate_gpos_single(otfcc_Font *font, table_OTL *table, otl_Subtable *_
 		int fromid = subtable->items[k].target.index;
 		HASH_FIND_INT(h, &fromid, s);
 		if (s) {
-			logWarning("[Consolidate] Detected glyph double-mapping about /%s.\n",
+			logWarning(_("[Consolidate] Detected glyph double-mapping about /{}."),
 			           subtable->items[k].target.name);
 		} else {
 			NEW(s);

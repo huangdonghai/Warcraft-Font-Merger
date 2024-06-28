@@ -1,5 +1,7 @@
 #include "vmtx.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 
 static INLINE void disposeVmtx(MOVE table_vmtx *table) {
@@ -9,7 +11,7 @@ static INLINE void disposeVmtx(MOVE table_vmtx *table) {
 
 caryll_standardRefType(table_vmtx, table_iVmtx, disposeVmtx);
 
-table_vmtx *otfcc_readVmtx(const otfcc_Packet packet, const otfcc_Options *options,
+table_vmtx *otfcc_readVmtx(const otfcc_Packet packet, const otfcc::options_t &options,
                            table_vhea *vhea, table_maxp *maxp) {
 	if (!vhea || !maxp || vhea->numOfLongVerMetrics == 0 ||
 	    maxp->numGlyphs < vhea->numOfLongVerMetrics)
@@ -39,14 +41,14 @@ table_vmtx *otfcc_readVmtx(const otfcc_Packet packet, const otfcc_Options *optio
 
 		return vmtx;
 	vmtx_CORRUPTED:
-		logWarning("Table 'vmtx' corrupted.\n");
+		logWarning(_("Table 'vmtx' corrupted."));
 		if (vmtx) { table_iVmtx.free(vmtx), vmtx = NULL; }
 	}
 	return NULL;
 }
 
 caryll_Buffer *otfcc_buildVmtx(const table_vmtx *vmtx, glyphid_t count_a, glyphid_t count_k,
-                               const otfcc_Options *options) {
+                               const otfcc::options_t &options) {
 	if (!vmtx) return NULL;
 	caryll_Buffer *buf = bufnew();
 	if (vmtx->metrics) {

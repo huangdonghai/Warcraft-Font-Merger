@@ -13,7 +13,7 @@ caryll_standardVectorImpl(subtable_gpos_single, otl_GposSingleEntry, gss_typeinf
 
 otl_Subtable *otl_read_gpos_single(const font_file_pointer data, uint32_t tableLength,
                                    uint32_t offset, const glyphid_t maxGlyphs,
-                                   const otfcc_Options *options) {
+                                   const otfcc::options_t &options) {
 	subtable_gpos_single *subtable = iSubtable_gpos_single.create();
 	otl_Coverage *targets = NULL;
 
@@ -68,7 +68,7 @@ json_value *otl_gpos_dump_single(const otl_Subtable *_subtable) {
 	}
 	return st;
 }
-otl_Subtable *otl_gpos_parse_single(const json_value *_subtable, const otfcc_Options *options) {
+otl_Subtable *otl_gpos_parse_single(const json_value *_subtable, const otfcc::options_t &options) {
 	subtable_gpos_single *subtable = iSubtable_gpos_single.create();
 	for (glyphid_t j = 0; j < _subtable->u.object.length; j++) {
 		if (_subtable->u.object.values[j].value &&

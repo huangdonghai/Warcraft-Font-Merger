@@ -1,5 +1,7 @@
 #include "stat.h"
 
+#include <intl.hpp>
+
 #include <time.h>
 #include <float.h>
 #include "support/util.h"
@@ -11,15 +13,16 @@ typedef enum { stat_not_started = 0, stat_doing = 1, stat_completed = 2 } stat_s
 
 glyf_GlyphStat stat_single_glyph(table_glyf *table, glyf_ComponentReference *gr,
                                  stat_status *stated, uint8_t depth, glyphid_t topj,
-                                 const otfcc_Options *options) {
+                                 const otfcc::options_t &options) {
 	glyf_GlyphStat stat = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 	glyphid_t j = gr->glyph.index;
 	if (depth >= 0xFF) return stat;
 	if (stated[j] == stat_doing) {
 		// We have a circular reference
-		logWarning("[Stat] Circular glyph reference found in gid %d to gid %d. The reference will "
-		           "be dropped.\n",
-		           topj, j);
+		logWarning(
+		    _("[Stat] Circular glyph reference found in gid {0} to gid {1}. The reference will "
+		      "be dropped."),
+		    topj, j);
 		stated[j] = stat_completed;
 		return stat;
 	}
@@ -94,7 +97,7 @@ glyf_GlyphStat stat_single_glyph(table_glyf *table, glyf_ComponentReference *gr,
 	return stat;
 }
 
-void statGlyf(otfcc_Font *font, const otfcc_Options *options) {
+void statGlyf(otfcc_Font *font, const otfcc::options_t &options) {
 	stat_status *stated;
 	NEW(stated, font->glyf->length);
 	pos_t xmin = 0xFFFFFFFF;
@@ -156,7 +159,7 @@ void statMaxp(otfcc_Font *font) {
 	font->maxp->maxSizeOfInstructions = instSize;
 }
 
-static void statHmtx(otfcc_Font *font, const otfcc_Options *options) {
+static void statHmtx(otfcc_Font *font, const otfcc::options_t &options) {
 	if (!font->glyf) return;
 	table_hmtx *hmtx;
 	NEW(hmtx);
@@ -212,13 +215,13 @@ static void statHmtx(otfcc_Font *font, const otfcc_Options *options) {
 	// set bit 1 in head.flags
 	font->head->flags = (font->head->flags & (~0x2)) | (lsbAtX_0 ? 0x2 : 0);
 }
-static void statVmtx(otfcc_Font *font, const otfcc_Options *options) {
+static void statVmtx(otfcc_Font *font, const otfcc::options_t &options) {
 	if (!font->glyf) return;
 	table_vmtx *vmtx;
 	NEW(vmtx);
 	glyphid_t count_a = font->glyf->length;
 	glyphid_t count_k = 0;
-	if (font->subtype == FONTTYPE_CFF && !options->cff_short_vmtx) {
+	if (font->subtype == FONTTYPE_CFF && !options.cff_short_vmtx) {
 		// pass
 	} else {
 		while (count_a > 2 && iVQ.getStill(font->glyf->items[count_a - 1]->advanceHeight) ==
@@ -258,7 +261,7 @@ static void statVmtx(otfcc_Font *font, const otfcc_Options *options) {
 	font->vhea->advanceHeightMax = maxHeight;
 	font->vmtx = vmtx;
 }
-static void statOS_2UnicodeRanges(otfcc_Font *font, const otfcc_Options *options) {
+static void statOS_2UnicodeRanges(otfcc_Font *font, const otfcc::options_t &options) {
 	cmap_Entry *item;
 	// Stat for OS/2.ulUnicodeRange.
 	uint32_t u1 = 0;
@@ -435,7 +438,7 @@ static void statOS_2UnicodeRanges(otfcc_Font *font, const otfcc_Options *options
 		}
 		if ((u >= 0x1F030 && u <= 0x1F09F) || (u >= 0x1F000 && u <= 0x1F02F)) { u4 |= (1 << 26); }
 	}
-	if (!options->keep_unicode_ranges) {
+	if (!options.keep_unicode_ranges) {
 		font->OS_2->ulUnicodeRange1 = u1;
 		font->OS_2->ulUnicodeRange2 = u2;
 		font->OS_2->ulUnicodeRange3 = u3;
@@ -452,8 +455,8 @@ static void statOS_2UnicodeRanges(otfcc_Font *font, const otfcc_Options *options
 		font->OS_2->usLastCharIndex = 0xFFFF;
 	}
 }
-static void statOS_2AverageWidth(otfcc_Font *font, const otfcc_Options *options) {
-	if (options->keep_average_char_width) return;
+static void statOS_2AverageWidth(otfcc_Font *font, const otfcc::options_t &options) {
+	if (options.keep_average_char_width) return;
 	uint32_t totalWidth = 0;
 	for (glyphid_t j = 0; j < font->glyf->length; j++) {
 		const pos_t adw = iVQ.getStill(font->glyf->items[j]->advanceWidth);
@@ -498,7 +501,7 @@ static uint16_t statMaxContextOTL(const table_OTL *table) {
 	}
 	return maxc;
 }
-static void statMaxContext(otfcc_Font *font, const otfcc_Options *options) {
+static void statMaxContext(otfcc_Font *font, const otfcc::options_t &options) {
 	uint16_t maxc = 1;
 	if (font->GSUB) {
 		uint16_t maxc_gsub = statMaxContextOTL(font->GSUB);
@@ -510,7 +513,7 @@ static void statMaxContext(otfcc_Font *font, const otfcc_Options *options) {
 	}
 	font->OS_2->usMaxContext = maxc;
 }
-static void statOS_2(otfcc_Font *font, const otfcc_Options *options) {
+static void statOS_2(otfcc_Font *font, const otfcc::options_t &options) {
 	statOS_2UnicodeRanges(font, options);
 	statOS_2AverageWidth(font, options);
 	statMaxContext(font, options);
@@ -616,10 +619,10 @@ static void statLTSH(otfcc_Font *font) {
 	font->LTSH = ltsh;
 }
 
-void otfcc_statFont(otfcc_Font *font, const otfcc_Options *options) {
+void otfcc_statFont(otfcc_Font *font, const otfcc::options_t &options) {
 	if (font->glyf && font->head) {
 		statGlyf(font, options);
-		if (!options->keep_modified_time) {
+		if (!options.keep_modified_time) {
 			font->head->modified = 2082844800 + (int64_t)time(NULL);
 		}
 	}
@@ -695,7 +698,7 @@ void otfcc_statFont(otfcc_Font *font, const otfcc_Options *options) {
 	statLTSH(font);
 }
 
-void otfcc_unstatFont(otfcc_Font *font, const otfcc_Options *options) {
+void otfcc_unstatFont(otfcc_Font *font, const otfcc::options_t &options) {
 	otfcc_iFont.deleteTable(font, 'hdmx');
 	otfcc_iFont.deleteTable(font, 'hmtx');
 	otfcc_iFont.deleteTable(font, 'VORG');

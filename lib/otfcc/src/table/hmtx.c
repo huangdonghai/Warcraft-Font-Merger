@@ -1,5 +1,7 @@
 #include "hmtx.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 
 static INLINE void disposeHmtx(MOVE table_hmtx *table) {
@@ -9,7 +11,7 @@ static INLINE void disposeHmtx(MOVE table_hmtx *table) {
 
 caryll_standardRefType(table_hmtx, table_iHmtx, disposeHmtx);
 
-table_hmtx *otfcc_readHmtx(const otfcc_Packet packet, const otfcc_Options *options,
+table_hmtx *otfcc_readHmtx(const otfcc_Packet packet, const otfcc::options_t &options,
                            table_hhea *hhea, table_maxp *maxp) {
 	if (!hhea || !maxp || !hhea->numberOfMetrics || maxp->numGlyphs < hhea->numberOfMetrics) {
 		return NULL;
@@ -39,14 +41,14 @@ table_hmtx *otfcc_readHmtx(const otfcc_Packet packet, const otfcc_Options *optio
 
 		return hmtx;
 	HMTX_CORRUPTED:
-		logWarning("Table 'hmtx' corrupted.\n");
+		logWarning(_("Table 'hmtx' corrupted."));
 		if (hmtx) { table_iHmtx.free(hmtx), hmtx = NULL; }
 	}
 	return NULL;
 }
 
 caryll_Buffer *otfcc_buildHmtx(const table_hmtx *hmtx, glyphid_t count_a, glyphid_t count_k,
-                               const otfcc_Options *options) {
+                               const otfcc::options_t &options) {
 	caryll_Buffer *buf = bufnew();
 	if (!hmtx) return buf;
 	if (hmtx->metrics) {

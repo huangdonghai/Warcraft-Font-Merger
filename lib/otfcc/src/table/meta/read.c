@@ -1,8 +1,10 @@
 #include "../meta.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 
-table_meta *otfcc_readMeta(const otfcc_Packet packet, const otfcc_Options *options) {
+table_meta *otfcc_readMeta(const otfcc_Packet packet, const otfcc::options_t &options) {
 	table_meta *meta = NULL;
 	FOR_TABLE('meta', table) {
 		if (table.length < 16) goto FAIL;
@@ -31,7 +33,7 @@ table_meta *otfcc_readMeta(const otfcc_Packet packet, const otfcc_Options *optio
 		return meta;
 
 	FAIL:
-		logWarning("Table 'meta' corrupted.\n");
+		logWarning(_("Table 'meta' corrupted."));
 		table_iMeta.free(meta);
 		meta = NULL;
 	}

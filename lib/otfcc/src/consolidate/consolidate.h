@@ -3,6 +3,6 @@
 
 #include "otfcc/font.h"
 
-extern void otfcc_consolidateFont(otfcc_Font *font, const otfcc_Options *options);
+extern void otfcc_consolidateFont(otfcc_Font *font, const otfcc::options_t &options);
 
 #endif

@@ -3,7 +3,7 @@
 #include "support/util.h"
 #include "bk/bkgraph.h"
 
-caryll_Buffer *otfcc_buildMeta(const table_meta *meta, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildMeta(const table_meta *meta, const otfcc::options_t &options) {
 	if (!meta || !meta->entries.length) return NULL;
 	bk_Block *root = bk_new_Block(b32, meta->version,                  // Version
 	                              b32, meta->flags,                    // Flags

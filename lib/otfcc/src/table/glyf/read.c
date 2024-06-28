@@ -1,5 +1,7 @@
 #include "../glyf.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 #include "support/ttinstr/ttinstr.h"
 
@@ -12,7 +14,7 @@ static glyf_Point *next_point(glyf_ContourList *contours, shapeid_t *cc, shapeid
 }
 
 static glyf_Glyph *otfcc_read_simple_glyph(font_file_pointer start, shapeid_t numberOfContours,
-                                           const otfcc_Options *options) {
+                                           const otfcc::options_t &options) {
 	glyf_Glyph *g = otfcc_newGlyf_glyph();
 	glyf_ContourList *contours = &g->contours;
 
@@ -132,7 +134,7 @@ static glyf_Glyph *otfcc_read_simple_glyph(font_file_pointer start, shapeid_t nu
 }
 
 static glyf_Glyph *otfcc_read_composite_glyph(font_file_pointer start,
-                                              const otfcc_Options *options) {
+                                              const otfcc::options_t &options) {
 	glyf_Glyph *g = otfcc_newGlyf_glyph();
 
 	// pass 1, read references quantity
@@ -188,7 +190,7 @@ static glyf_Glyph *otfcc_read_composite_glyph(font_file_pointer start,
 		ref.useMyMetrics = flags & USE_MY_METRICS;
 		if (flags & SCALED_COMPONENT_OFFSET &&
 		    (flags & WE_HAVE_AN_X_AND_Y_SCALE || flags & WE_HAVE_A_TWO_BY_TWO)) {
-			logWarning("glyf: SCALED_COMPONENT_OFFSET is not supported.")
+			logWarning(_("glyf: SCALED_COMPONENT_OFFSET is not supported."))
 		}
 		if (flags & WE_HAVE_INSTRUCTIONS) { glyphHasInstruction = true; }
 		glyf_iReferenceList.push(&g->references, ref);
@@ -212,7 +214,7 @@ static glyf_Glyph *otfcc_read_composite_glyph(font_file_pointer start,
 }
 
 static glyf_Glyph *otfcc_read_glyph(font_file_pointer data, uint32_t offset,
-                                    const otfcc_Options *options) {
+                                    const otfcc::options_t &options) {
 	font_file_pointer start = data + offset;
 	int16_t numberOfContours = read_16u(start);
 	glyf_Glyph *g;
@@ -517,7 +519,7 @@ static vq_Region *createRegionFromTuples(uint16_t dimensions, f2dot14 *peak, f2d
 
 static INLINE void polymorphizeGlyph(glyphid_t gid, glyf_GlyphPtr glyph,
                                      const TuplePolymorphizerCtx *ctx,
-                                     struct GlyphVariationData *gvd, const otfcc_Options *options) {
+                                     struct GlyphVariationData *gvd, const otfcc::options_t &options) {
 
 	shapeid_t totalPoints = 0;
 	foreach (glyf_Contour *c, glyph->contours) { totalPoints += c->length; }
@@ -605,7 +607,7 @@ static INLINE void polymorphizeGlyph(glyphid_t gid, glyf_GlyphPtr glyph,
 
 // NOTE: for polymorphize, we would
 // TODO: polymorphize advanceWidth, verticalOrigin and advanceHeight
-static INLINE void polymorphize(const otfcc_Packet packet, const otfcc_Options *options,
+static INLINE void polymorphize(const otfcc_Packet packet, const otfcc::options_t &options,
                                 table_glyf *glyf, const GlyfIOContext *ctx) {
 	if (!ctx->fvar || !ctx->fvar->axes.length) return;
 	FOR_TABLE('gvar', table) {
@@ -613,7 +615,7 @@ static INLINE void polymorphize(const otfcc_Packet packet, const otfcc_Options *
 		if (table.length < sizeof(struct GVARHeader)) return;
 		struct GVARHeader *header = (struct GVARHeader *)data;
 		if (be16(header->axisCount) != ctx->fvar->axes.length) {
-			logWarning("Axes number in GVAR and FVAR are inequal");
+			logWarning(_("Axes number in GVAR and FVAR are inequal"));
 			return;
 		};
 		for (glyphid_t j = 0; j < glyf->length; j++) {
@@ -641,7 +643,7 @@ static INLINE void polymorphize(const otfcc_Packet packet, const otfcc_Options *
 	}
 }
 
-table_glyf *otfcc_readGlyf(const otfcc_Packet packet, const otfcc_Options *options,
+table_glyf *otfcc_readGlyf(const otfcc_Packet packet, const otfcc::options_t &options,
                            const GlyfIOContext *ctx) {
 	uint32_t *offsets = NULL;
 	table_glyf *glyf = NULL;
@@ -667,7 +669,7 @@ table_glyf *otfcc_readGlyf(const otfcc_Packet packet, const otfcc_Options *optio
 		foundLoca = true;
 		break;
 	LOCA_CORRUPTED:
-		logWarning("table 'loca' corrupted.\n");
+		logWarning(_("table 'loca' corrupted."));
 		if (offsets) { FREE(offsets), offsets = NULL; }
 		continue;
 	}
@@ -690,7 +692,7 @@ table_glyf *otfcc_readGlyf(const otfcc_Packet packet, const otfcc_Options *optio
 		}
 		goto PRESENT;
 	GLYF_CORRUPTED:
-		logWarning("table 'glyf' corrupted.\n");
+		logWarning(_("table 'glyf' corrupted."));
 		if (glyf) { DELETE(table_iGlyf.free, glyf), glyf = NULL; }
 	}
 	goto ABSENT;

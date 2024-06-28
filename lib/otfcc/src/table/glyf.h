@@ -15,12 +15,12 @@ typedef struct {
 	bool exportFDSelect;
 } GlyfIOContext;
 
-table_glyf *otfcc_readGlyf(const otfcc_Packet packet, const otfcc_Options *options,
+table_glyf *otfcc_readGlyf(const otfcc_Packet packet, const otfcc::options_t &options,
                            const GlyfIOContext *ctx);
-void otfcc_dumpGlyf(const table_glyf *table, json_value *root, const otfcc_Options *options,
+void otfcc_dumpGlyf(const table_glyf *table, json_value *root, const otfcc::options_t &options,
                     const GlyfIOContext *ctx);
 table_glyf *otfcc_parseGlyf(const json_value *root, otfcc_GlyphOrder *glyph_order,
-                            const otfcc_Options *options);
+                            const otfcc::options_t &options);
 
 typedef struct {
 	caryll_Buffer *glyf;
@@ -28,7 +28,7 @@ typedef struct {
 } table_GlyfAndLocaBuffers;
 
 table_GlyfAndLocaBuffers otfcc_buildGlyf(const table_glyf *table, table_head *head,
-                                         const otfcc_Options *options);
+                                         const otfcc::options_t &options);
 
 typedef enum {
 	GLYF_FLAG_ON_CURVE = 1,

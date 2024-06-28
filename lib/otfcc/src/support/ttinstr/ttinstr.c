@@ -621,8 +621,8 @@ static int instr_typify(struct instrdata *id) {
 	return (lh);
 }
 
-json_value *dump_ttinstr(uint8_t *instructions, uint32_t length, const otfcc_Options *options) {
-	if (options->instr_as_bytes) {
+json_value *dump_ttinstr(uint8_t *instructions, uint32_t length, const otfcc::options_t &options) {
+	if (options.instr_as_bytes) {
 		size_t len = 0;
 		uint8_t *buf = base64_encode(instructions, length, &len);
 		return json_string_new_length((uint32_t)len, (char *)buf);

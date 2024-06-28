@@ -1,5 +1,7 @@
 #include "gsub-multi.h"
 
+#include <intl.hpp>
+
 typedef struct {
 	int fromid;
 	sds fromname;
@@ -11,20 +13,20 @@ static int by_from_id_multi(gsub_multi_hash *a, gsub_multi_hash *b) {
 }
 
 bool consolidate_gsub_multi(otfcc_Font *font, table_OTL *table, otl_Subtable *_subtable,
-                            const otfcc_Options *options) {
+                            const otfcc::options_t &options) {
 	subtable_gsub_multi *subtable = &(_subtable->gsub_multi);
 	gsub_multi_hash *h = NULL;
 
 	for (glyphid_t k = 0; k < subtable->length; k++) {
 		if (!GlyphOrder.consolidateHandle(font->glyph_order, &subtable->items[k].from)) {
-			logWarning("[Consolidate] Ignored missing glyph /%s.\n", subtable->items[k].from.name);
+			logWarning(_("[Consolidate] Ignored missing glyph /{}."), subtable->items[k].from.name);
 			continue;
 		}
 		fontop_consolidateCoverage(font, subtable->items[k].to, options);
 		Coverage.shrink(subtable->items[k].to, false);
 		if (!subtable->items[k].to->numGlyphs) {
-			logWarning("[Consolidate] Ignoring empty one-to-many / alternative substitution for "
-			           "glyph /%s.\n",
+			logWarning(_("[Consolidate] Ignoring empty one-to-many / alternative substitution for "
+			             "glyph /{}."),
 			           subtable->items[k].from.name);
 			continue;
 		}
@@ -59,6 +61,6 @@ bool consolidate_gsub_multi(otfcc_Font *font, table_OTL *table, otl_Subtable *_s
 }
 
 bool consolidate_gsub_alternative(otfcc_Font *font, table_OTL *table, otl_Subtable *_subtable,
-                                  const otfcc_Options *options) {
+                                  const otfcc::options_t &options) {
 	return consolidate_gsub_multi(font, table, _subtable, options);
 }

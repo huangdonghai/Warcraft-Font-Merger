@@ -31,9 +31,9 @@ static void _dump_lookup(otl_Lookup *lookup, json_value *dump) {
 	LOOKUP_DUMPER(otl_type_gpos_markToLigature, otl_gpos_dump_markToLigature);
 }
 
-void otfcc_dumpOtl(const table_OTL *table, json_value *root, const otfcc_Options *options, const char *tag) {
+void otfcc_dumpOtl(const table_OTL *table, json_value *root, const otfcc::options_t &options, const char *tag) {
 	if (!table || !table->languages.length || !table->lookups.length || !table->features.length) return;
-	loggedStep("%s", tag) {
+	loggedStep(tag) {
 		json_value *otl = json_object_new(3);
 		loggedStep("Languages") {
 			// dump script list

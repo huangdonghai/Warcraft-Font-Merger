@@ -1,5 +1,7 @@
 #include "GDEF.h"
 
+#include <intl.hpp>
+
 typedef struct {
 	int gid;
 	sds name;
@@ -9,7 +11,7 @@ typedef struct {
 static int by_gid(GDEF_ligcaret_hash *a, GDEF_ligcaret_hash *b) {
 	return a->gid - b->gid;
 }
-void consolidate_GDEF(otfcc_Font *font, table_GDEF *gdef, const otfcc_Options *options) {
+void consolidate_GDEF(otfcc_Font *font, table_GDEF *gdef, const otfcc::options_t &options) {
 	if (!font || !font->glyph_order || !gdef) return;
 	if (gdef->glyphClassDef) {
 		fontop_consolidateClassDef(font, gdef->glyphClassDef, options);
@@ -45,7 +47,7 @@ void consolidate_GDEF(otfcc_Font *font, table_GDEF *gdef, const otfcc_Options *o
 					otl_iCaretValueList.move(&s->carets, &gdef->ligCarets.items[j].carets);
 					HASH_ADD_INT(h, gid, s);
 				} else {
-					logWarning("[Consolidate] Detected caret value double-mapping about glyph %s",
+					logWarning(_("[Consolidate] Detected caret value double-mapping about glyph {}"),
 					           gname);
 				}
 			}

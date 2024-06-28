@@ -1,4 +1,7 @@
 #include "OS_2.h"
+
+#include <intl.hpp>
+
 #include "support/util.h"
 
 static INLINE void initOS2(table_OS_2 *table) {
@@ -10,7 +13,7 @@ static INLINE void disposeOS2(MOVE table_OS_2 *table) {
 }
 caryll_standardRefType(table_OS_2, table_iOS_2, initOS2, disposeOS2);
 
-table_OS_2 *otfcc_readOS_2(const otfcc_Packet packet, const otfcc_Options *options) {
+table_OS_2 *otfcc_readOS_2(const otfcc_Packet packet, const otfcc::options_t &options) {
 	table_OS_2 *os_2 = NULL;
 	FOR_TABLE('OS/2', table) {
 		font_file_pointer data = table.data;
@@ -78,7 +81,7 @@ table_OS_2 *otfcc_readOS_2(const otfcc_Packet packet, const otfcc_Options *optio
 		return os_2;
 
 	OS_2_CORRUPTED:
-		logWarning("table 'OS/2' corrupted.\n");
+		logWarning(_("table 'OS/2' corrupted."));
 		if (os_2 != NULL) FREE(os_2);
 	}
 	return NULL;
@@ -237,7 +240,7 @@ const char *unicodeRangeLabels4[] = {"Buginese",
                                      "Domino_and_Mahjong_Tiles",
                                      NULL};
 
-void otfcc_dumpOS_2(const table_OS_2 *table, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpOS_2(const table_OS_2 *table, json_value *root, const otfcc::options_t &options) {
 	if (!table) return;
 	loggedStep("OS/2") {
 		json_value *os_2 = json_object_new(30);
@@ -303,7 +306,7 @@ void otfcc_dumpOS_2(const table_OS_2 *table, json_value *root, const otfcc_Optio
 	}
 }
 
-table_OS_2 *otfcc_parseOS_2(const json_value *root, const otfcc_Options *options) {
+table_OS_2 *otfcc_parseOS_2(const json_value *root, const otfcc::options_t &options) {
 	table_OS_2 *os_2 = table_iOS_2.create();
 	if (!os_2) return NULL;
 	json_value *table = NULL;
@@ -386,7 +389,7 @@ table_OS_2 *otfcc_parseOS_2(const json_value *root, const otfcc_Options *options
 	return os_2;
 }
 
-caryll_Buffer *otfcc_buildOS_2(const table_OS_2 *os_2, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildOS_2(const table_OS_2 *os_2, const otfcc::options_t &options) {
 	if (!os_2) return NULL;
 	caryll_Buffer *buf = bufnew();
 	bufwrite16b(buf, os_2->version);

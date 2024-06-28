@@ -74,7 +74,7 @@ FAIL:;
 	return g;
 }
 
-table_GDEF *otfcc_readGDEF(const otfcc_Packet packet, const otfcc_Options *options) {
+table_GDEF *otfcc_readGDEF(const otfcc_Packet packet, const otfcc::options_t &options) {
 	table_GDEF *gdef = NULL;
 	FOR_TABLE('GDEF', table) {
 		font_file_pointer data = table.data;
@@ -140,7 +140,7 @@ static json_value *dumpGDEFLigCarets(const table_GDEF *gdef) {
 	return _carets;
 }
 
-void otfcc_dumpGDEF(const table_GDEF *gdef, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpGDEF(const table_GDEF *gdef, json_value *root, const otfcc::options_t &options) {
 	if (!gdef) return;
 	loggedStep("GDEF") {
 		json_value *_gdef = json_object_new(4);
@@ -188,7 +188,7 @@ static void ligCaretFromJson(const json_value *_carets, otl_LigCaretTable *lc) {
 	}
 }
 
-table_GDEF *otfcc_parseGDEF(const json_value *root, const otfcc_Options *options) {
+table_GDEF *otfcc_parseGDEF(const json_value *root, const otfcc::options_t &options) {
 	table_GDEF *gdef = NULL;
 	json_value *table = NULL;
 	if ((table = json_obj_get_type(root, "GDEF", json_object))) {
@@ -233,7 +233,7 @@ static bk_Block *writeLigCarets(const otl_LigCaretTable *lc) {
 	return lct;
 }
 
-caryll_Buffer *otfcc_buildGDEF(const table_GDEF *gdef, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildGDEF(const table_GDEF *gdef, const otfcc::options_t &options) {
 	if (!gdef) return NULL;
 	bk_Block *bGlyphClassDef = NULL;
 	bk_Block *bAttachList = NULL;

@@ -1,5 +1,7 @@
 #include "private.h"
 
+#include <intl.hpp>
+
 typedef enum { LOOKUP_ORDER_FORCE, LOOKUP_ORDER_FILE } lookup_order_type;
 
 typedef struct {
@@ -24,9 +26,9 @@ typedef struct {
 } language_hash;
 static bool _declareLookupParser(const char *lt, otl_LookupType llt,
                                  otl_Subtable *(*parser)(const json_value *,
-                                                         const otfcc_Options *options),
+                                                         const otfcc::options_t &options),
                                  json_value *_lookup, char *lookupName,
-                                 const otfcc_Options *options, lookup_hash **lh);
+                                 const otfcc::options_t &options, lookup_hash **lh);
 
 #define LOOKUP_PARSER(llt, parser)                                                                 \
 	if (!parsed) {                                                                                 \
@@ -34,7 +36,7 @@ static bool _declareLookupParser(const char *lt, otl_LookupType llt,
 		    _declareLookupParser(tableNames[llt], llt, parser, lookup, lookupName, options, lh);   \
 	}
 
-static bool _parse_lookup(json_value *lookup, char *lookupName, const otfcc_Options *options,
+static bool _parse_lookup(json_value *lookup, char *lookupName, const otfcc::options_t &options,
                           lookup_hash **lh) {
 	bool parsed = false;
 	LOOKUP_PARSER(otl_type_gsub_single, otl_gsub_parse_single);
@@ -55,27 +57,27 @@ static bool _parse_lookup(json_value *lookup, char *lookupName, const otfcc_Opti
 
 static bool _declareLookupParser(const char *lt, otl_LookupType llt,
                                  otl_Subtable *(*parser)(const json_value *,
-                                                         const otfcc_Options *options),
+                                                         const otfcc::options_t &options),
                                  json_value *_lookup, char *lookupName,
-                                 const otfcc_Options *options, lookup_hash **lh) {
+                                 const otfcc::options_t &options, lookup_hash **lh) {
 
 	// detect a valid type field exists
 	json_value *type = json_obj_get_type(_lookup, "type", json_string);
 	if (!type || strcmp(type->u.string.ptr, lt)) {
-		if (!type) logWarning("Lookup %s does not have a valid 'type' field.", lookupName);
+		if (!type) logWarning(_("Lookup {} does not have a valid 'type' field."), lookupName);
 		return false;
 	}
 	// no duplicate lookup has been parsed
 	lookup_hash *item = NULL;
 	HASH_FIND_STR(*lh, lookupName, item);
 	if (item) {
-		logWarning("Lookup %s already exists.", lookupName);
+		logWarning(_("Lookup {} already exists."), lookupName);
 		return false;
 	}
 	// detect valid subtables array
 	json_value *_subtables = json_obj_get_type(_lookup, "subtables", json_array);
 	if (!_subtables) {
-		logWarning("Lookup %s does not have a valid subtable list.", lookupName);
+		logWarning(_("Lookup {} does not have a valid subtable list."), lookupName);
 		return false;
 	}
 	// init this lookup
@@ -87,7 +89,7 @@ static bool _declareLookupParser(const char *lt, otl_LookupType llt,
 	if (markAttachmentType) { lookup->flags |= markAttachmentType << 8; }
 	// start parse subtables
 	tableid_t subtableCount = _subtables->u.array.length;
-	loggedStep("%s", lookupName) {
+	loggedStep(lookupName) {
 		for (tableid_t j = 0; j < subtableCount; j++) {
 			json_value *_subtable = _subtables->u.array.values[j];
 			if (_subtable && _subtable->type == json_object) {
@@ -97,7 +99,7 @@ static bool _declareLookupParser(const char *lt, otl_LookupType llt,
 		}
 	}
 	if (!lookup->subtables.length) {
-		logWarning("Lookup %s does not have any subtables.", lookupName);
+		logWarning(_("Lookup {} does not have any subtables."), lookupName);
 		otfcc_delete_lookup(lookup);
 		return false;
 	}
@@ -112,7 +114,7 @@ static bool _declareLookupParser(const char *lt, otl_LookupType llt,
 	return true;
 }
 
-static lookup_hash *figureOutLookupsFromJSON(json_value *lookups, const otfcc_Options *options) {
+static lookup_hash *figureOutLookupsFromJSON(json_value *lookups, const otfcc::options_t &options) {
 	lookup_hash *lh = NULL;
 
 	for (uint32_t j = 0; j < lookups->u.object.length; j++) {
@@ -121,7 +123,7 @@ static lookup_hash *figureOutLookupsFromJSON(json_value *lookups, const otfcc_Op
 			bool parsed =
 			    _parse_lookup(lookups->u.object.values[j].value, lookupName, options, &lh);
 			if (!parsed) {
-				logWarning("[OTFCC-fea] Ignoring invalid or unsupported lookup %s.\n", lookupName);
+				logWarning(_("[OTFCC-fea] Ignoring invalid or unsupported lookup {}."), lookupName);
 			}
 		} else if (lookups->u.object.values[j].value->type == json_string) {
 			char *thatname = lookups->u.object.values[j].value->u.string.ptr;
@@ -142,7 +144,7 @@ static lookup_hash *figureOutLookupsFromJSON(json_value *lookups, const otfcc_Op
 }
 
 static void feature_merger_activate(json_value *d, const bool sametag, const char *objtype,
-                                    const otfcc_Options *options) {
+                                    const otfcc::options_t &options) {
 	for (uint32_t j = 0; j < d->u.object.length; j++) {
 		json_value *jthis = d->u.object.values[j].value;
 		char *kthis = d->u.object.values[j].name;
@@ -156,7 +158,7 @@ static void feature_merger_activate(json_value *d, const bool sametag, const cha
 				json_value *v = json_string_new_length(nkthis, kthis);
 				v->parent = d;
 				d->u.object.values[k].value = v;
-				logNotice("[OTFCC-fea] Merged duplicate %s '%s' into '%s'.\n", objtype, kthat,
+				logNotice(_("[OTFCC-fea] Merged duplicate {0} '{1}' into '{2}'."), objtype, kthat,
 				          kthis);
 			}
 		}
@@ -164,10 +166,10 @@ static void feature_merger_activate(json_value *d, const bool sametag, const cha
 }
 
 static feature_hash *figureOutFeaturesFromJSON(json_value *features, lookup_hash *lh,
-                                               const char *tag, const otfcc_Options *options) {
+                                               const char *tag, const otfcc::options_t &options) {
 	feature_hash *fh = NULL;
 	// Remove duplicates
-	if (options->merge_features) { feature_merger_activate(features, true, "feature", options); }
+	if (options.merge_features) { feature_merger_activate(features, true, "feature", options); }
 	// Resolve features
 	for (uint32_t j = 0; j < features->u.object.length; j++) {
 		char *featureName = features->u.object.values[j].name;
@@ -183,8 +185,9 @@ static feature_hash *figureOutFeaturesFromJSON(json_value *features, lookup_hash
 				if (item) {
 					otl_iLookupRefList.push(&al, item->lookup);
 				} else {
-					logWarning("Lookup assignment %s for feature [%s/%s] is missing or invalid.",
-					           term->u.string.ptr, tag, featureName)
+					logWarning(
+					    _("Lookup assignment {0} for feature [{1}/{2}] is missing or invalid."),
+					    term->u.string.ptr, tag, featureName)
 				}
 			}
 			if (al.length > 0) {
@@ -199,15 +202,14 @@ static feature_hash *figureOutFeaturesFromJSON(json_value *features, lookup_hash
 					otl_iLookupRefList.replace(&s->feature->lookups, al);
 					HASH_ADD_STR(fh, name, s);
 				} else {
-					logWarning("[OTFCC-fea] Duplicate feature for [%s/%s]. This feature will "
-					           "be ignored.\n",
+					logWarning(_("[OTFCC-fea] Duplicate feature for [{0}/{1}]. This feature will "
+					             "be ignored."),
 					           tag, featureName);
 					otl_iLookupRefList.dispose(&al);
 				}
 			} else {
-				logWarning("[OTFCC-fea] There is no valid lookup "
-				           "assignments for [%s/%s]. This feature will be "
-				           "ignored.\n",
+				logWarning(_("[OTFCC-fea] There is no valid lookup assignments for [{0}/{1}]. This "
+				             "feature will be ignored.)"),
 				           tag, featureName);
 				otl_iLookupRefList.dispose(&al);
 			}
@@ -231,7 +233,7 @@ bool isValidLanguageName(const char *name, const size_t length) {
 	return length == 9 && name[4] == SCRIPT_LANGUAGE_SEPARATOR;
 }
 static language_hash *figureOutLanguagesFromJson(json_value *languages, feature_hash *fh,
-                                                 const char *tag, const otfcc_Options *options) {
+                                                 const char *tag, const otfcc::options_t &options) {
 	language_hash *sh = NULL;
 	// languages
 	for (uint32_t j = 0; j < languages->u.object.length; j++) {
@@ -272,15 +274,14 @@ static language_hash *figureOutLanguagesFromJson(json_value *languages, feature_
 					otl_iFeatureRefList.replace(&s->language->features, af);
 					HASH_ADD_STR(sh, name, s);
 				} else {
-					logWarning("[OTFCC-fea] Duplicate language item [%s/%s]. This language "
-					           "term will be ignored.\n",
+					logWarning(_("[OTFCC-fea] Duplicate language item [{0}/{1}]. This language "
+					             "term will be ignored."),
 					           tag, languageName);
 					otl_iFeatureRefList.dispose(&af);
 				}
 			} else {
-				logWarning("[OTFCC-fea] There is no valid feature "
-				           "assignments for [%s/%s]. This language term "
-				           "will be ignored.\n",
+				logWarning(_("[OTFCC-fea] There is no valid feature assignments for [{0}/{1}]. "
+				             "This language term will be ignored."),
 				           tag, languageName);
 				otl_iFeatureRefList.dispose(&af);
 			}
@@ -302,7 +303,8 @@ static int by_feature_name(feature_hash *a, feature_hash *b) {
 static int by_language_name(language_hash *a, language_hash *b) {
 	return strcmp(a->name, b->name);
 }
-table_OTL *otfcc_parseOtl(const json_value *root, const otfcc_Options *options, const char *tag) {
+table_OTL *otfcc_parseOtl(const json_value *root, const otfcc::options_t &options,
+                          const char *tag) {
 	table_OTL *otl = NULL;
 	json_value *table = json_obj_get_type(root, tag, json_object);
 	if (!table) goto FAIL;
@@ -315,7 +317,7 @@ table_OTL *otfcc_parseOtl(const json_value *root, const otfcc_Options *options, 
 	lookups = json_obj_get_type(table, "lookups", json_object);
 	if (!languages || !features || !lookups) goto FAIL;
 
-	loggedStep("%s", tag) {
+	loggedStep(tag) {
 		lookup_hash *lh = figureOutLookupsFromJSON(lookups, options);
 		json_value *lookupOrder = json_obj_get_type(table, "lookupOrder", json_array);
 		if (lookupOrder) {
@@ -337,7 +339,7 @@ table_OTL *otfcc_parseOtl(const json_value *root, const otfcc_Options *options, 
 		language_hash *sh = figureOutLanguagesFromJson(languages, fh, tag, options);
 		HASH_SORT(sh, by_language_name);
 		if (!HASH_COUNT(lh) || !HASH_COUNT(fh) || !HASH_COUNT(sh)) {
-			options->logger->dedent(options->logger);
+			options.logger.dedent();
 			goto FAIL;
 		}
 
@@ -372,7 +374,7 @@ table_OTL *otfcc_parseOtl(const json_value *root, const otfcc_Options *options, 
 	return otl;
 FAIL:
 	if (otl) {
-		logWarning("[OTFCC-fea] Ignoring invalid or incomplete OTL table %s.\n", tag);
+		logWarning(_("[OTFCC-fea] Ignoring invalid or incomplete OTL table {}."), tag);
 		table_iOTL.free(otl);
 	}
 	return NULL;

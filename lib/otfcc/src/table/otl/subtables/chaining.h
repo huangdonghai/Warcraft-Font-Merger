@@ -10,12 +10,12 @@
 // GPOS chaining
 
 otl_Subtable *otl_read_chaining(const font_file_pointer data, uint32_t tableLength, uint32_t offset,
-                                const glyphid_t maxGlyphs, const otfcc_Options *options);
+                                const glyphid_t maxGlyphs, const otfcc::options_t &options);
 otl_Subtable *otl_read_contextual(const font_file_pointer data, uint32_t tableLength,
                                   uint32_t offset, const glyphid_t maxGlyphs,
-                                  const otfcc_Options *options);
+                                  const otfcc::options_t &options);
 json_value *otl_dump_chaining(const otl_Subtable *_subtable);
-otl_Subtable *otl_parse_chaining(const json_value *_subtable, const otfcc_Options *options);
+otl_Subtable *otl_parse_chaining(const json_value *_subtable, const otfcc::options_t &options);
 caryll_Buffer *otfcc_build_chaining(const otl_Subtable *_subtable);
 caryll_Buffer *otfcc_build_contextual(const otl_Subtable *_subtable);
 

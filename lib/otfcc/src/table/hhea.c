@@ -1,5 +1,7 @@
 #include "hhea.h"
 
+#include <intl.hpp>
+
 #include "support/util.h"
 
 static INLINE void initHhea(table_hhea *hhea) {
@@ -11,13 +13,13 @@ static INLINE void disposeHhea(MOVE table_hhea *hhea) {
 }
 caryll_standardRefType(table_hhea, table_iHhea, initHhea, disposeHhea);
 
-table_hhea *otfcc_readHhea(const otfcc_Packet packet, const otfcc_Options *options) {
+table_hhea *otfcc_readHhea(const otfcc_Packet packet, const otfcc::options_t &options) {
 	FOR_TABLE('hhea', table) {
 		font_file_pointer data = table.data;
 		uint32_t length = table.length;
 
 		if (length < 36) {
-			logWarning("table 'hhea' corrupted.\n");
+			logWarning(_("table 'hhea' corrupted."));
 		} else {
 			table_hhea *hhea;
 			NEW(hhea);
@@ -44,7 +46,7 @@ table_hhea *otfcc_readHhea(const otfcc_Packet packet, const otfcc_Options *optio
 	return NULL;
 }
 
-void otfcc_dumpHhea(const table_hhea *table, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpHhea(const table_hhea *table, json_value *root, const otfcc::options_t &options) {
 	if (!table) return;
 	loggedStep("hhea") {
 		json_value *hhea = json_object_new(13);
@@ -63,7 +65,7 @@ void otfcc_dumpHhea(const table_hhea *table, json_value *root, const otfcc_Optio
 	}
 }
 
-table_hhea *otfcc_parseHhea(const json_value *root, const otfcc_Options *options) {
+table_hhea *otfcc_parseHhea(const json_value *root, const otfcc::options_t &options) {
 	table_hhea *hhea = table_iHhea.create();
 	json_value *table = NULL;
 	if ((table = json_obj_get_type(root, "hhea", json_object))) {
@@ -84,7 +86,7 @@ table_hhea *otfcc_parseHhea(const json_value *root, const otfcc_Options *options
 	return hhea;
 }
 
-caryll_Buffer *otfcc_buildHhea(const table_hhea *hhea, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildHhea(const table_hhea *hhea, const otfcc::options_t &options) {
 	if (!hhea) return NULL;
 	caryll_Buffer *buf = bufnew();
 	bufwrite32b(buf, hhea->version);

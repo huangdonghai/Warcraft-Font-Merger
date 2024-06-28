@@ -1,5 +1,7 @@
 #include "BASE.h"
 
+#include <intl.hpp>
+
 #include "otl/private.h"
 
 static void deleteBaseAxis(MOVE otl_BaseAxis *axis) {
@@ -112,7 +114,7 @@ FAIL:
 	return axis;
 }
 
-table_BASE *otfcc_readBASE(const otfcc_Packet packet, const otfcc_Options *options) {
+table_BASE *otfcc_readBASE(const otfcc_Packet packet, const otfcc::options_t &options) {
 	table_BASE *base = NULL;
 	FOR_TABLE('BASE', table) {
 		font_file_pointer data = table.data;
@@ -127,7 +129,7 @@ table_BASE *otfcc_readBASE(const otfcc_Packet packet, const otfcc_Options *optio
 		if (offsetV) base->vertical = readAxis(data, tableLength, offsetV);
 		return base;
 	FAIL:
-		logWarning("Table 'BASE' Corrupted");
+		logWarning(_("Table 'BASE' Corrupted"));
 		DELETE(table_iBASE.free, base);
 	}
 	return base;
@@ -157,7 +159,7 @@ static json_value *axisToJson(const otl_BaseAxis *axis) {
 	return _axis;
 }
 
-void otfcc_dumpBASE(const table_BASE *base, json_value *root, const otfcc_Options *options) {
+void otfcc_dumpBASE(const table_BASE *base, json_value *root, const otfcc::options_t &options) {
 	if (!base) return;
 	loggedStep("BASE") {
 		json_value *_base = json_object_new(2);
@@ -207,7 +209,7 @@ static otl_BaseAxis *axisFromJson(const json_value *_axis) {
 	return axis;
 }
 
-table_BASE *otfcc_parseBASE(const json_value *root, const otfcc_Options *options) {
+table_BASE *otfcc_parseBASE(const json_value *root, const otfcc::options_t &options) {
 	table_BASE *base = NULL;
 	json_value *table = NULL;
 	if ((table = json_obj_get_type(root, "BASE", json_object))) {
@@ -326,7 +328,7 @@ bk_Block *axisToBk(const otl_BaseAxis *axis) {
 	                    bkover);
 }
 
-caryll_Buffer *otfcc_buildBASE(const table_BASE *base, const otfcc_Options *options) {
+caryll_Buffer *otfcc_buildBASE(const table_BASE *base, const otfcc::options_t &options) {
 	if (!base) return NULL;
 	bk_Block *root = bk_new_Block(b32, 0x10000,                    // Version
 	                              p16, axisToBk(base->horizontal), // HorizAxis

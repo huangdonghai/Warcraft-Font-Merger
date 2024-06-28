@@ -217,7 +217,7 @@ static json_value *glyf_glyph_dump_maskdefs(glyf_MaskList *masks, glyf_StemDefLi
 	return a;
 }
 
-static json_value *glyf_dump_glyph(glyf_Glyph *g, const otfcc_Options *options,
+static json_value *glyf_dump_glyph(glyf_Glyph *g, const otfcc::options_t &options,
                                    const GlyfIOContext *ctx) {
 	json_value *glyph = json_object_new(12);
 	json_object_push(glyph, "advanceWidth", json_new_VQ(g->advanceWidth, ctx->fvar));
@@ -237,7 +237,7 @@ static json_value *glyf_dump_glyph(glyf_Glyph *g, const otfcc_Options *options,
 	}
 
 	// hinting data
-	if (!options->ignore_hints) {
+	if (!options.ignore_hints) {
 		if (g->instructions && g->instructionsLength) {
 			json_object_push(glyph, "instructions",
 			                 dump_ttinstr(g->instructions, g->instructionsLength, options));
@@ -271,7 +271,7 @@ void otfcc_dump_glyphorder(const table_glyf *table, json_value *root) {
 	}
 	json_object_push(root, "glyph_order", preserialize(order));
 }
-void otfcc_dumpGlyf(const table_glyf *table, json_value *root, const otfcc_Options *options,
+void otfcc_dumpGlyf(const table_glyf *table, json_value *root, const otfcc::options_t &options,
                     const GlyfIOContext *ctx) {
 	if (!table) return;
 	loggedStep("glyf") {
@@ -281,7 +281,7 @@ void otfcc_dumpGlyf(const table_glyf *table, json_value *root, const otfcc_Optio
 			json_object_push(glyf, g->name, glyf_dump_glyph(g, options, ctx));
 		}
 		json_object_push(root, "glyf", glyf);
-		if (!options->ignore_glyph_order) otfcc_dump_glyphorder(table, root);
+		if (!options.ignore_glyph_order) otfcc_dump_glyphorder(table, root);
 	}
 }
 
@@ -424,7 +424,7 @@ static void parse_masks(json_value *md, glyf_MaskList *masks) {
 }
 
 static glyf_Glyph *otfcc_glyf_parse_glyph(json_value *glyphdump, otfcc_GlyphOrderEntry *order_entry,
-                                          const otfcc_Options *options) {
+                                          const otfcc::options_t &options) {
 	glyf_Glyph *g = otfcc_newGlyf_glyph();
 	g->name = sdsdup(order_entry->name);
 	iVQ.replace(&g->advanceWidth, json_vqOf(json_obj_get(glyphdump, "advanceWidth"), NULL));
@@ -433,7 +433,7 @@ static glyf_Glyph *otfcc_glyf_parse_glyph(json_value *glyphdump, otfcc_GlyphOrde
 	iVQ.replace(&g->verticalOrigin, json_vqOf(json_obj_get(glyphdump, "verticalOrigin"), NULL));
 	glyf_parse_contours(json_obj_get_type(glyphdump, "contours", json_array), g);
 	glyf_parse_references(json_obj_get_type(glyphdump, "references", json_array), g);
-	if (!options->ignore_hints) {
+	if (!options.ignore_hints) {
 		parse_ttinstr(json_obj_get(glyphdump, "instructions"), g, makeInstrsForGlyph,
 		              wrongInstrsForGlyph);
 		parse_stems(json_obj_get_type(glyphdump, "stemH", json_array), &g->stemH);
@@ -449,7 +449,7 @@ static glyf_Glyph *otfcc_glyf_parse_glyph(json_value *glyphdump, otfcc_GlyphOrde
 }
 
 table_glyf *otfcc_parseGlyf(const json_value *root, otfcc_GlyphOrder *glyph_order,
-                            const otfcc_Options *options) {
+                            const otfcc::options_t &options) {
 	if (root->type != json_object || !glyph_order) return NULL;
 	table_glyf *glyf = NULL;
 	json_value *table;
