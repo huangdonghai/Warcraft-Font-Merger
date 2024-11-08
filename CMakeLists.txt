@@ -24,15 +24,18 @@ include_directories(
 	"${PROJECT_SOURCE_DIR}/include"
 	"${PROJECT_SOURCE_DIR}/include/dep"
 	"${PROJECT_SOURCE_DIR}/src/otfcc"
+	"${PROJECT_SOURCE_DIR}/src/polyfill-msvc"
 )
 
 file(GLOB_RECURSE src_otfcc src/otfcc/**.c)
 file(GLOB_RECURSE src_otfcc_extern src/otfcc-extern/**.c)
+file(GLOB src_polyfill_msvc src/polyfill_msvc/*.c)
 
 
 add_executable(otfccdump
 	${src_otfcc}
 	${src_otfcc_extern}
+	${src_polyfill_msvc}
 	src/otfcc-driver/otfccdump.c
 	src/otfcc-driver/stopwatch.c
 )
@@ -40,11 +43,13 @@ add_executable(otfccdump
 add_executable(otfccbuild
 	${src_otfcc}
 	${src_otfcc_extern}
+	${src_polyfill_msvc}
 	src/otfcc-driver/otfccbuild.c
 	src/otfcc-driver/stopwatch.c
 )
 
 add_executable(merge-otd
+	${src_polyfill_msvc}
 	src/merger/merge-name.cpp
 	src/merger/merge-otd.cpp
 	src/merger/ps2tt.cpp
