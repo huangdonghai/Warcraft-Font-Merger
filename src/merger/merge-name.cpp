@@ -776,7 +776,11 @@ void MergeNameTable(vector<json> &nameTables, json &font,
 	RemoveRedundantTable(nameTables);
 
 	if (overrideNameStyle.empty()) {
+#if 0 // HACK by hdh
 		font["name"] = AutoMergeNameTable(nameTables);
+#else
+		font["name"] = nameTables[0];
+#endif
 		return;
 	}
 

@@ -20,6 +20,24 @@ static void *serializeToOTF(otfcc_Font *font, const otfcc_Options *options) {
 		otfcc_SFNTBuilder_pushTable(builder, 'CFF ', otfcc_buildCFF(r, options));
 	}
 
+    // Begin HDH HACK
+    // HACK hhea for DuoKan Vertical-rl writing mode
+	if (font->head && font->hhea) {
+		font->hhea->advanceWidthMax =
+		    font->hhea->advanceWidthMax < font->head->unitsPerEm
+		        ? font->hhea->advanceWidthMax
+		        : font->head->unitsPerEm;
+
+        float lineHeightScale = 276.0f / 256.0f;
+		float curScale = ((float)(font->hhea->ascender - font->hhea->descender)) /
+		                 font->head->unitsPerEm;
+		float realScale = lineHeightScale / curScale;
+		font->hhea->ascender = floorf(font->hhea->ascender * realScale + 0.5f);
+		font->hhea->descender =
+		    floorf(font->hhea->descender * realScale + 0.5f);
+    }
+    // End HDH HACK
+
 	otfcc_SFNTBuilder_pushTable(builder, 'head', otfcc_buildHead(font->head, options));
 	otfcc_SFNTBuilder_pushTable(builder, 'hhea', otfcc_buildHhea(font->hhea, options));
 	otfcc_SFNTBuilder_pushTable(builder, 'OS/2', otfcc_buildOS_2(font->OS_2, options));
