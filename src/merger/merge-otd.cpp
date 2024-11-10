@@ -117,9 +117,16 @@ void MergeFont(json &base, json &ext) {
 	double baseUpm = base["head"]["unitsPerEm"];
 	double extUpm = ext["head"]["unitsPerEm"];
 
-	if (baseUpm != extUpm) {
+    // HACK by hdh, alian chinese baseline
+	double scale = baseUpm / extUpm;
+	double baseDescender = base["OS_2"]["sTypoDescender"];
+	double extDescender = ext["OS_2"]["sTypoDescender"];
+	double offset = baseDescender - extDescender * scale;
+    // END HACK
+
+	if (baseUpm != extUpm || offset != 0) {
 		for (auto &glyph : ext["glyf"])
-			Transform(glyph, baseUpm / extUpm, 0, 0, baseUpm / extUpm, 0, 0);
+			Transform(glyph, baseUpm / extUpm, 0, 0, baseUpm / extUpm, 0, offset); // HACK by hdh, add offset
 	}
 
 	for (json::iterator it = ext["cmap"].begin(); it != ext["cmap"].end();
