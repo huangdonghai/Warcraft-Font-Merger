@@ -113,7 +113,9 @@ void FixGlyphName(json &font, const std::string &prefix) {
 	}
 }
 
-void MergeFont(json &base, json &ext) {
+static std::string jpChars[] = {"20851", "22797"}; // 关，复 force replace
+
+void MergeFont(json &base, json &ext, bool jp=false) {
 	double baseUpm = base["head"]["unitsPerEm"];
 	double extUpm = ext["head"]["unitsPerEm"];
 
@@ -131,7 +133,18 @@ void MergeFont(json &base, json &ext) {
 
 	for (json::iterator it = ext["cmap"].begin(); it != ext["cmap"].end();
 	     ++it) {
-		if (base["cmap"].find(it.key()) == base["cmap"].end()) {
+        // HACK by hdh
+		bool isForced = false;
+		if (jp) {
+			for (auto &jpchar : jpChars) {
+				if (it.key() == jpchar) {
+					isForced = true;
+					break;
+				}
+            }
+		}
+        // END HACK by hdh
+		if (base["cmap"].find(it.key()) == base["cmap"].end() || isForced) {
 			std::string name = *it;
 			base["cmap"][it.key()] = ext["cmap"][it.key()];
 			if (base["glyf"].find(name) == base["glyf"].end()) {
@@ -192,6 +205,8 @@ int main(int argc, char *u8argv[]) {
 	std::string baseFileName;
 	std::vector<std::string> appendFileNames;
 
+    bool isJp = false;
+
 	auto cli = ({
 		using namespace clipp;
 		((option("-o", "--output") & value("out.otd", outputPath)) %
@@ -233,6 +248,7 @@ int main(int argc, char *u8argv[]) {
 　　Upright（Normal、Roman、Unslanted、""）
 　　Italic （Italized）
 　　Oblique（Slant）)+",
+		 option("-jp").set(isJp).doc("target is japanese font"),
 		 value("base.otd", baseFileName),
 		 values("append.otd", appendFileNames));
 	});
@@ -273,7 +289,7 @@ int main(int argc, char *u8argv[]) {
 		RemoveBlankGlyph(ext);
 		nametables.push_back(ext["name"]);
 		FixGlyphName(ext, name + std::string(":"));
-		MergeFont(base, ext);
+		MergeFont(base, ext, isJp);
 		if (ext.find("OS_2") != ext.end()) {
 			auto &OS_2 = ext["OS_2"];
 			if (OS_2.find("ulCodePageRange1") != OS_2.end())
