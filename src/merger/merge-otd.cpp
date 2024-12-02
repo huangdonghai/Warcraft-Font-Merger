@@ -147,7 +147,7 @@ void MergeFont(json &base, json &ext, bool jp=false) {
 		if (base["cmap"].find(it.key()) == base["cmap"].end() || isForced) {
 			std::string name = *it;
 			base["cmap"][it.key()] = ext["cmap"][it.key()];
-			if (base["glyf"].find(name) == base["glyf"].end()) {
+			if (base["glyf"].find(name) == base["glyf"].end() || isForced) {
 				base["glyf"][name] = std::move(ext["glyf"][name]);
 				MoveRef(base["glyf"][name], base, ext);
 			}
