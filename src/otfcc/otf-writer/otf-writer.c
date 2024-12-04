@@ -22,7 +22,7 @@ static void *serializeToOTF(otfcc_Font *font, const otfcc_Options *options) {
 
     // HACK by hdh
     // HACK hhea for DuoKan Vertical-rl writing mode
-	if (font->head && font->hhea) {
+	if (font->head && font->hhea && options->duokan_fix) {
 		font->hhea->advanceWidthMax =
 		    font->hhea->advanceWidthMax < font->head->unitsPerEm
 		        ? font->hhea->advanceWidthMax

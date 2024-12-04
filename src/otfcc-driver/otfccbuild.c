@@ -157,6 +157,7 @@ int main(int argc, char *argv[]) {
 	                            {"quiet", no_argument, NULL, 0},
 	                            {"optimize", required_argument, NULL, 'O'},
 	                            {"output", required_argument, NULL, 'o'},
+	                            {"duokan-fix", no_argument, NULL, 0}, // HACK by hdh
 	                            {0, 0, 0, 0}};
 
 	while ((c = getopt_long(argc, argv, "vhqskiO:o:", longopts, &option_index)) != (-1)) {
@@ -204,7 +205,9 @@ int main(int argc, char *argv[]) {
 					options->verbose = true;
 				} else if (strcmp(longopts[option_index].name, "quiet") == 0) {
 					options->quiet = true;
-				}
+			    } else if (strcmp(longopts[option_index].name, "duokan-fix") == 0) {
+				    options->duokan_fix = true;
+			    }
 				break;
 			case 'v':
 				show_version = true;

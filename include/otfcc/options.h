@@ -30,6 +30,7 @@ typedef struct {
 	bool decimal_cmap;
 	bool name_glyphs_by_hash;
 	bool name_glyphs_by_gid;
+	bool duokan_fix; // HACK by hdh
 	char *glyph_name_prefix;
 	otfcc_ILogger *logger;
 } otfcc_Options;
