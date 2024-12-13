@@ -72,6 +72,41 @@ void Transform(json &glyph, double a, double b, double c, double d, double dx,
 		}
 }
 
+void GetGlyphExtends(json& glyph, double& xmin, double& xmax, double& ymin,
+    double& ymax)
+{
+	xmin = ymin = std::numeric_limits<double>::max();
+	xmax = ymax = std::numeric_limits<double>::min();
+
+	if (glyph.find("contours") != glyph.end())
+		for (auto &contour : glyph["contours"])
+			for (auto &point : contour) {
+				double x = point["x"];
+				double y = point["y"];
+				if (x < xmin)
+					xmin = x;
+				if (x > xmax)
+					xmax = x;
+				if (y < ymin)
+					ymin = y;
+				if (y > ymax)
+					ymax = y;
+			}
+	if (glyph.find("references") != glyph.end())
+		for (auto &reference : glyph["references"]) {
+			double x = reference["x"];
+			double y = reference["y"];
+			if (x < xmin)
+				xmin = x;
+			if (x > xmax)
+				xmax = x;
+			if (y < ymin)
+				ymin = y;
+			if (y > ymax)
+				ymax = y;
+		}
+}
+
 // move referenced glyphs recursively
 void MoveRef(json &glyph, json &base, json &ext) {
 	if (glyph.find("references") != glyph.end())
@@ -113,7 +148,7 @@ void FixGlyphName(json &font, const std::string &prefix) {
 	}
 }
 
-static std::string jpChars[] = {"20851", "22797"}; // 关，复 force replace
+static std::string jpChars[] = {"20851", "22797", "20011", "183"}; // 关，复, 丫, ·(U+00B7),  force replace
 
 void MergeFont(json &base, json &ext, bool jp=false) {
 	double baseUpm = base["head"]["unitsPerEm"];
@@ -151,6 +186,75 @@ void MergeFont(json &base, json &ext, bool jp=false) {
 				base["glyf"][name] = std::move(ext["glyf"][name]);
 				MoveRef(base["glyf"][name], base, ext);
 			}
+		}
+	}
+}
+
+static std::wstring verticalPunctuations = L"︵︶﹇﹈︷︸︹︺︽︾︿﹀﹁﹂﹃﹄︻︼︗︘";
+static std::wstring horizonPunctuations = L"（）［］｛｝〔〕《》〈〉【】〖〗"; // 「」『』
+
+void DuokanFix(json &base) {
+    double baseUpm = base["head"]["unitsPerEm"];
+	double space = round(baseUpm * 60.0 / 1000.0);
+	auto& cmap = base["cmap"];
+#if 0
+    for (auto &ch : verticalPunctuations) {
+		auto chname = std::to_string(ch);
+		auto it = cmap.find(chname);
+		if (it == cmap.end())
+			continue;
+
+        auto &glyphName = *it;
+		auto glyphIt = base["glyf"].find(glyphName);
+		if (glyphIt == base["glyf"].end())
+			continue;
+
+        auto &glyph = *glyphIt;
+		if (glyph.find("advanceHeight") != glyph.end()) {
+			double xmin, xmax, ymin, ymax;
+			GetGlyphExtends(glyph, xmin, xmax, ymin, ymax);
+
+			glyph["advanceHeight"] = round(ymax - ymin + 2 * space);
+			glyph["verticalOrigin"] =
+			    round(ymax + space);
+		}
+	}
+#endif
+	for (auto &ch : horizonPunctuations) {
+		auto chname = std::to_string(ch);
+		auto it = cmap.find(chname);
+		if (it == cmap.end())
+			continue;
+
+		auto &glyphName = *it;
+		auto glyphIt = base["glyf"].find(glyphName);
+		if (glyphIt == base["glyf"].end())
+			continue;
+
+		auto &glyph = *glyphIt;
+		if (glyph.find("advanceWidth") != glyph.end()) {
+            // already fixed
+			if (glyph["advanceWidth"] < baseUpm)
+                continue;
+
+			double xmin, xmax, ymin, ymax;
+			GetGlyphExtends(glyph, xmin, xmax, ymin, ymax);
+
+			double width = xmax - xmin;
+			if (width > 0.5 * baseUpm)
+				continue; // too large, don't fix
+
+            double offset = 0;
+			if (xmin > 0.25 * baseUpm)
+				offset = 0.25 * baseUpm;
+			if (xmin > 0.5 * baseUpm)
+				offset = 0.5 * baseUpm;
+
+            if (offset != 0) {
+			    Transform(glyph, 1, 0, 0, 1, -offset, 0); // HACK by hdh, add offset
+            }
+
+			glyph["advanceWidth"] = 0.5 * baseUpm;
 		}
 	}
 }
@@ -206,6 +310,7 @@ int main(int argc, char *u8argv[]) {
 	std::vector<std::string> appendFileNames;
 
     bool isJp = false;
+	bool duokanFix = false;
 
 	auto cli = ({
 		using namespace clipp;
@@ -249,13 +354,16 @@ int main(int argc, char *u8argv[]) {
 　　Italic （Italized）
 　　Oblique（Slant）)+",
 		 option("-jp").set(isJp).doc("target is japanese font"),
-		 value("base.otd", baseFileName),
-		 values("append.otd", appendFileNames));
+		 option("-dk").set(duokanFix).doc("duokan fix"),
+		 values("base.otd", appendFileNames));
 	});
 	if (!clipp::parse(argc, u8argv, cli) || appendFileNames.empty()) {
 		nowide::cout << clipp::make_man_page(cli, "merge-otd") << std::endl;
 		return EXIT_FAILURE;
 	}
+
+    baseFileName = appendFileNames[0];
+	appendFileNames.erase(appendFileNames.begin());
 
 	std::vector<json> ulCodePageRanges1, ulCodePageRanges2;
 	std::vector<json> nametables;
@@ -298,6 +406,10 @@ int main(int argc, char *u8argv[]) {
 				ulCodePageRanges2.push_back(OS_2["ulCodePageRange2"]);
 		}
 	}
+
+    if (duokanFix) {
+		DuokanFix(base);
+    }
 
 	if (base.find("OS_2") != base.end()) {
 		auto &OS_2 = base["OS_2"];
