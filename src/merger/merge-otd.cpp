@@ -72,6 +72,47 @@ void Transform(json &glyph, double a, double b, double c, double d, double dx,
 		}
 }
 
+void FixQuota(json& glyph, double upm, double ascender, double dx, double height, double isAdjustUp)
+{
+    struct Point
+    {
+		double x, y;
+    };
+
+    double ycenter = ascender - 0.5 * upm;
+	double ydiff = upm * 0.7 - height;
+
+	if (glyph.find("contours") != glyph.end())
+		for (auto &contour : glyph["contours"]) {
+			std::vector<Point> points;
+			for (auto &point : contour) {
+				double x = point["x"];
+				double y = point["y"];
+				points.push_back({x, y});
+			}
+
+            // inverse contour
+			for (auto &point : contour) {
+				auto p = points.back();
+				p.x += dx;
+				p.y = ycenter - (p.y - ycenter);
+
+                if (isAdjustUp) {
+					if (p.y > ycenter)
+						p.y += ydiff;
+				} else {
+					if (p.y < ycenter)
+						p.y -= ydiff;
+				}
+
+                point["x"] = p.x;
+				point["y"] = p.y;
+
+                points.pop_back();
+			}
+		}
+}
+
 void GetGlyphExtends(json& glyph, double& xmin, double& xmax, double& ymin,
     double& ymax)
 {
@@ -191,13 +232,15 @@ void MergeFont(json &base, json &ext, bool jp=false) {
 }
 
 static std::wstring verticalPunctuations = L"︵︶﹇﹈︷︸︹︺︽︾︿﹀﹁﹂﹃﹄︻︼︗︘";
-static std::wstring horizonPunctuations = L"（）［］｛｝〔〕《》〈〉【】〖〗"; // 「」『』
+static std::wstring horizonPunctuations = L"（）［］｛｝〔〕《》〈〉【】〖〗「」『』"; // 
 
 void DuokanFix(json &base) {
     double baseUpm = base["head"]["unitsPerEm"];
 	double space = round(baseUpm * 60.0 / 1000.0);
 	auto& cmap = base["cmap"];
-#if 0
+	double Ascender = base["OS_2"]["sTypoAscender"];
+
+#if 1
     for (auto &ch : verticalPunctuations) {
 		auto chname = std::to_string(ch);
 		auto it = cmap.find(chname);
@@ -211,12 +254,23 @@ void DuokanFix(json &base) {
 
         auto &glyph = *glyphIt;
 		if (glyph.find("advanceHeight") != glyph.end()) {
+			if (glyph["advanceHeight"] < baseUpm)
+				continue;
+
 			double xmin, xmax, ymin, ymax;
 			GetGlyphExtends(glyph, xmin, xmax, ymin, ymax);
 
-			glyph["advanceHeight"] = round(ymax - ymin + 2 * space);
-			glyph["verticalOrigin"] =
-			    round(ymax + space);
+            if (ymax - ymin > 0.5 * baseUpm)
+				continue;
+
+			glyph["advanceHeight"] = 0.5 * baseUpm;
+			double vOrigin = Ascender;
+			if (ymax < Ascender - baseUpm * 0.25)
+				vOrigin = Ascender - baseUpm * 0.25;
+			if (ymax < Ascender - baseUpm * 0.5)
+				vOrigin = Ascender - baseUpm * 0.5;
+
+			glyph["verticalOrigin"] = vOrigin;
 		}
 	}
 #endif
@@ -250,11 +304,21 @@ void DuokanFix(json &base) {
 			if (xmin > 0.5 * baseUpm)
 				offset = 0.5 * baseUpm;
 
+			glyph["advanceWidth"] = 0.5 * baseUpm;
+
+            if (ch == L'「' || ch == L'『') {
+				FixQuota(glyph, baseUpm, Ascender, -offset, ymax - ymin, true);
+				continue;
+            }
+
+            if (ch == L'」' || ch == L'』') {
+				FixQuota(glyph, baseUpm, Ascender, -offset, ymax - ymin, false);
+				continue;
+			}
+
             if (offset != 0) {
 			    Transform(glyph, 1, 0, 0, 1, -offset, 0); // HACK by hdh, add offset
             }
-
-			glyph["advanceWidth"] = 0.5 * baseUpm;
 		}
 	}
 }
