@@ -236,6 +236,7 @@ static std::wstring horizonPunctuations = L"（）［］｛｝〔〕《》〈〉
 
 void DuokanFix(json &base) {
     double baseUpm = base["head"]["unitsPerEm"];
+	double haflUpm = 0.5 * baseUpm;
 	double space = round(baseUpm * 60.0 / 1000.0);
 	auto& cmap = base["cmap"];
 	double Ascender = base["OS_2"]["sTypoAscender"];
@@ -274,7 +275,10 @@ void DuokanFix(json &base) {
 		}
 	}
 #endif
+
+    bool isLeft = false;
 	for (auto &ch : horizonPunctuations) {
+		isLeft = !isLeft;
 		auto chname = std::to_string(ch);
 		auto it = cmap.find(chname);
 		if (it == cmap.end())
@@ -295,16 +299,38 @@ void DuokanFix(json &base) {
 			GetGlyphExtends(glyph, xmin, xmax, ymin, ymax);
 
 			double width = xmax - xmin;
-			if (width > 0.5 * baseUpm)
-				continue; // too large, don't fix
-
             double offset = 0;
+#if 0
 			if (xmin > 0.25 * baseUpm)
 				offset = 0.25 * baseUpm;
 			if (xmin > 0.5 * baseUpm)
 				offset = 0.5 * baseUpm;
+#else
+			double curSpace = space;
+			double curWidth = 0;
+			if (isLeft) {
+				if (baseUpm - xmax < space)
+					curSpace = baseUpm - xmax;
+			} else {
+				if (xmin < space)
+					curSpace = xmin;
+            }
+#endif
+			curWidth = curSpace * 2 + width;
+			if (curWidth > baseUpm)
+				continue; // too large, don't fix
 
-			glyph["advanceWidth"] = 0.5 * baseUpm;
+            if (curWidth < haflUpm)
+				curWidth = haflUpm;
+
+            if (isLeft) {
+				offset = xmin - (curWidth - width - curSpace);
+			} else {
+				offset = xmin - curSpace;
+			}
+
+
+			glyph["advanceWidth"] = curWidth;
 
             if (ch == L'「' || ch == L'『') {
 				FixQuota(glyph, baseUpm, Ascender, -offset, ymax - ymin, true);
