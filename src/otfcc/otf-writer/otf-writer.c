@@ -21,20 +21,23 @@ static void *serializeToOTF(otfcc_Font *font, const otfcc_Options *options) {
 	}
 
     // HACK by hdh
-    // HACK hhea for DuoKan Vertical-rl writing mode
+    // HACK hhea for DuoKan Vertical-rl writing mode, simulate 方正新书宋 metrics
 	if (font->head && font->hhea && options->duokan_fix) {
 		font->hhea->advanceWidthMax =
 		    font->hhea->advanceWidthMax < font->head->unitsPerEm
 		        ? font->hhea->advanceWidthMax
 		        : font->head->unitsPerEm;
 
-        float lineHeightScale = 276.0f / 256.0f;
-		float curScale = ((float)(font->hhea->ascender - font->hhea->descender)) /
-		                 font->head->unitsPerEm;
-		float realScale = lineHeightScale / curScale;
-		font->hhea->ascender = floorf(font->hhea->ascender * realScale + 0.5f);
-		font->hhea->descender = floorf(font->hhea->descender * realScale + 0.5f);
-		font->hhea->lineGap = 0;
+        const double refLineHeight = 276.0 / 256.0;
+		const double refLineGap = 23.0 / 256.0;
+
+        double ascender = font->OS_2->sTypoAscender;
+		double lineHeight = refLineHeight * font->head->unitsPerEm;
+		double lineGap = refLineGap * font->head->unitsPerEm;
+
+		font->hhea->ascender = ascender;
+		font->hhea->descender = ascender - lineHeight;
+		font->hhea->lineGap = lineGap;
     }
     // End HACK
 
