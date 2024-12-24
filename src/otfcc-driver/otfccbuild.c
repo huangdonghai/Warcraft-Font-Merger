@@ -60,6 +60,7 @@ void printHelp() {
 	        " --subroutinize            : Subroutinize CFF table.\n"
 	        " --stub-cmap4              : Create a stub `cmap` format 4 subtable if format\n"
 	        "                             12 subtable is present.\n"
+	        " --duokan-fix              : Fix for duokan readers's vertical-rl writing mode.\n"
 	        "\n");
 }
 void readEntireFile(char *inPath, char **_buffer, long *_length) {

@@ -27,7 +27,7 @@ static void *serializeToOTF(otfcc_Font *font, const otfcc_Options *options) {
 		    font->hhea->advanceWidthMax < font->head->unitsPerEm
 		        ? font->hhea->advanceWidthMax
 		        : font->head->unitsPerEm;
-
+#if 0
         const double refLineHeight = 276.0 / 256.0;
 		const double refLineGap = 23.0 / 256.0;
 
@@ -38,6 +38,7 @@ static void *serializeToOTF(otfcc_Font *font, const otfcc_Options *options) {
 		font->hhea->ascender = ascender;
 		font->hhea->descender = ascender - lineHeight;
 		font->hhea->lineGap = lineGap;
+#endif
     }
     // End HACK
 
