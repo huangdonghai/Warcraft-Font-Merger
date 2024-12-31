@@ -403,6 +403,34 @@ void DuokanFix(json& base)
 	DuokanFixPunc(base);
 }
 
+void IvdFix(json& base)
+{
+    const int startivd = 917760;
+	const int maxvid = 917760 + 16;
+
+	if (base.find("cmap_uvs") == base.end())
+		return;
+
+    for (json::iterator it = base["cmap"].begin(); it != base["cmap"].end(); ++it) {
+		auto name = it.key();
+
+        for (int i = startivd; i < maxvid; i++) {
+            auto newname = name + " " + std::to_string(i);
+
+            if (base["cmap_uvs"].find(newname) == base["cmap_uvs"].end()) {
+                break; // no ivd
+            }
+
+            if (base["cmap"][name] == base["cmap_uvs"][newname]) {
+				continue; // same glyph
+			}
+
+            base["cmap"][name] = base["cmap_uvs"][newname];
+            break;
+        }
+    }
+}
+
 void RemoveBlankGlyph(json &font) {
 	static UnicodeInvisible invisible;
 	std::vector<std::string> eraseList;
@@ -455,6 +483,7 @@ int main(int argc, char *u8argv[]) {
 
     bool isJp = false;
 	bool duokanFix = false;
+	bool ivd = false;
 
 	auto cli = ({
 		using namespace clipp;
@@ -499,6 +528,7 @@ int main(int argc, char *u8argv[]) {
 　　Oblique（Slant）)+",
 		 option("-jp").set(isJp).doc("target is japanese font"),
 		 option("-dk").set(duokanFix).doc("duokan fix"),
+		 option("-ivd").set(ivd).doc("use IVD"),
 		 values("base.otd", appendFileNames));
 	});
 	if (!clipp::parse(argc, u8argv, cli) || appendFileNames.empty()) {
@@ -553,6 +583,10 @@ int main(int argc, char *u8argv[]) {
 
     if (duokanFix) {
 		DuokanFix(base);
+    }
+
+    if (ivd) {
+		IvdFix(base);
     }
 
 	if (base.find("OS_2") != base.end()) {
